@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+.idea/
+.vscode/
+.classpath
+.project
+.settings/
+
+# Node
+node_modules/
+dist/
+coverage/
+.npm/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
