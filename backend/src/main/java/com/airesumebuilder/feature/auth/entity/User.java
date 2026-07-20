@@ -30,6 +30,10 @@ public class User {
 
     @Column(nullable = false, length = 50)
     private String status = "ACTIVE";
+    @Column(name = "failed_login_attempts", nullable = false) private int failedLoginAttempts;
+    @Column(name = "locked_until") private Instant lockedUntil;
+    @Column(name = "verified_at") private Instant verifiedAt;
+    @Column(name = "last_login_at") private Instant lastLoginAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -102,6 +106,14 @@ public class User {
     public void setStatus(String status) {
         this.status = status;
     }
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int value) { failedLoginAttempts = value; }
+    public Instant getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(Instant value) { lockedUntil = value; }
+    public Instant getVerifiedAt() { return verifiedAt; }
+    public void setVerifiedAt(Instant value) { verifiedAt = value; }
+    public Instant getLastLoginAt() { return lastLoginAt; }
+    public void setLastLoginAt(Instant value) { lastLoginAt = value; }
 
     public Instant getCreatedAt() {
         return createdAt;

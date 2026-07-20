@@ -1,0 +1,2 @@
+package com.airesumebuilder.feature.pdf.service;import static org.assertj.core.api.Assertions.assertThat;import com.airesumebuilder.feature.pdf.repository.PdfExportRepository.ResumeDocument;import java.nio.charset.StandardCharsets;import org.junit.jupiter.api.Test;
+class PdfRendererTest{@Test void createsARealPdfAndSanitizesControlCharacters(){byte[]pdf=new PdfRenderer().render(new ResumeDocument(1,2,"Resume","Summary\u0000 text","Engineer","Demo User"));assertThat(new String(pdf,0,5,StandardCharsets.US_ASCII)).isEqualTo("%PDF-");assertThat(pdf.length).isGreaterThan(500);}}

@@ -1,17 +1,2 @@
-package com.airesumebuilder.feature.pdf.controller;
-
-import com.airesumebuilder.common.dto.ApiResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/api/pdf")
-public class PdfController {
-
-    @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() {
-        return ResponseEntity.ok(ApiResponse.success("ok", "PDF module ready."));
-    }
-}
+package com.airesumebuilder.feature.pdf.controller;import com.airesumebuilder.common.dto.ApiResponse;import com.airesumebuilder.feature.pdf.repository.PdfExportRepository.Export;import com.airesumebuilder.feature.pdf.service.PdfService;import com.airesumebuilder.security.CurrentUser;import java.util.List;import org.springframework.http.*;import org.springframework.web.bind.annotation.*;
+@RestController@RequestMapping("/api/v1/pdf")public class PdfController{private final PdfService service;private final CurrentUser user;public PdfController(PdfService s,CurrentUser u){service=s;user=u;}@GetMapping(value="/resumes/{id}",produces=MediaType.APPLICATION_PDF_VALUE)public ResponseEntity<byte[]>generate(@PathVariable long id){var pdf=service.generate(user.email(),id);return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+pdf.fileName()+"\"").contentType(MediaType.APPLICATION_PDF).contentLength(pdf.content().length).body(pdf.content());}@GetMapping("/resumes/{id}/history")public ResponseEntity<ApiResponse<List<Export>>>history(@PathVariable long id){return ResponseEntity.ok(ApiResponse.success(service.history(user.email(),id),"PDF export history retrieved."));}}

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "refresh_tokens")
+@Table(name = "refresh_tokens", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_refresh_tokens_hash", columnNames = "token_hash")
+})
 public class RefreshToken {
 
     @Id

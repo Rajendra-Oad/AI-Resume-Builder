@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch backend",
+      "request": "launch",
+      "mainClass": "com.airesumebuilder.AiResumeBuilderApplication",
+      "projectName": "ai-resume-builder-backend"
+    },
+    {
+      "type": "chrome",
+      "name": "Launch frontend in Chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend"
+    }
+  ]
+}

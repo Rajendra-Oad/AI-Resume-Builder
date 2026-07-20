@@ -1,17 +1,2 @@
-package com.airesumebuilder.feature.audit.controller;
-
-import com.airesumebuilder.common.dto.ApiResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/api/audit")
-public class AuditController {
-
-    @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() {
-        return ResponseEntity.ok(ApiResponse.success("ok", "Audit module ready."));
-    }
-}
+package com.airesumebuilder.feature.audit.controller;import com.airesumebuilder.common.dto.*;import com.airesumebuilder.feature.audit.service.AuditService;import com.airesumebuilder.security.CurrentUser;import org.springframework.http.ResponseEntity;import org.springframework.web.bind.annotation.*;
+@RestController@RequestMapping("/api/v1/audit")public class AuditController{private final AuditService service;private final CurrentUser user;public AuditController(AuditService s,CurrentUser u){service=s;user=u;}@GetMapping public ResponseEntity<ApiResponse<java.util.List<AuditService.AuditEntry>>>list(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="20")int size){var result=service.listMine(user.email(),page,size);int pages=(int)Math.ceil(result.total()/(double)result.size());return ResponseEntity.ok(ApiResponse.paginated(result.items(),new Pagination(result.page(),result.size(),result.total(),pages)));}}

@@ -1,0 +1,3 @@
+package com.airesumebuilder.feature.ats.service;
+import static org.assertj.core.api.Assertions.assertThat;import org.junit.jupiter.api.Test;
+class AtsScoringEngineTest{@Test void scoresExactKeywordsAndReportsMissingOnes(){var score=new AtsScoringEngine().score("Java Spring engineer","Java Spring React");assertThat(score.overallScore()).isEqualByComparingTo("66.67");assertThat(score.keywords()).extracting(AtsScoringEngine.KeywordResult::keyword).containsExactly("java","spring","react");assertThat(score.keywords()).filteredOn(k->!k.found()).extracting(AtsScoringEngine.KeywordResult::keyword).containsExactly("react");}@Test void handlesEmptyJobDescription(){assertThat(new AtsScoringEngine().score("Java","").overallScore()).isZero();}}

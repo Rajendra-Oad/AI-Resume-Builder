@@ -1,33 +1,46 @@
 package com.airesumebuilder.feature.auth.service.impl;
 
+import com.airesumebuilder.common.exception.AuthenticationException;
+import com.airesumebuilder.common.exception.ConflictException;
 import com.airesumebuilder.feature.auth.dto.request.LoginRequest;
 import com.airesumebuilder.feature.auth.dto.request.RegisterRequest;
 import com.airesumebuilder.feature.auth.dto.response.AuthResponse;
 import com.airesumebuilder.feature.auth.entity.User;
 import com.airesumebuilder.feature.auth.repository.UserRepository;
 import com.airesumebuilder.feature.auth.service.AuthService;
+import com.airesumebuilder.security.JwtService;
+import com.airesumebuilder.security.RefreshTokenService;
+import com.airesumebuilder.feature.auth.dto.request.ChangePasswordRequest;
+import com.airesumebuilder.feature.auth.dto.request.ResetPasswordRequest;
+import com.airesumebuilder.security.AccountRecoveryService;
+import java.time.Duration;
+import java.time.Instant;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    private final AccountRecoveryService accountRecoveryService;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, RefreshTokenService refreshTokenService, AccountRecoveryService accountRecoveryService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
+        this.accountRecoveryService = accountRecoveryService;
     }
 
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new ConflictException("Email already registered.");
         }
 
         User user = new User();
@@ -37,22 +50,37 @@ public class AuthServiceImpl implements AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole("USER");
         user.setStatus("ACTIVE");
+        user.setVerifiedAt(Instant.now());
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return new AuthResponse(UUID.randomUUID().toString(), user.getEmail(), user.getEmail());
+        return response(savedUser);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+            .orElseThrow(() -> new AuthenticationException("Invalid email or password."));
 
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid email or password");
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) throw new AuthenticationException("This account is temporarily locked. Try again later.");
+        if (!"ACTIVE".equals(user.getStatus()) || user.getDeletedAt() != null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+            if (user.getFailedLoginAttempts() >= 5) user.setLockedUntil(Instant.now().plus(Duration.ofMinutes(15)));
+            throw new AuthenticationException("Invalid email or password.");
         }
-
-        return new AuthResponse(UUID.randomUUID().toString(), user.getEmail(), user.getEmail());
+        user.setFailedLoginAttempts(0); user.setLockedUntil(null); user.setLastLoginAt(Instant.now());
+        return response(user);
     }
+
+    @Override @Transactional(readOnly = true) public AuthResponse refresh(String token) {
+        User user = refreshTokenService.validate(token);
+        return new AuthResponse(jwtService.createAccessToken(user), String.valueOf(user.getId()), user.getEmail(), user.getRole(), token);
+    }
+    @Override @Transactional public void logout(String token) { refreshTokenService.revoke(token); }
+    @Override @Transactional public void changePassword(String email, ChangePasswordRequest request) { User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationException("Invalid account.")); if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) throw new AuthenticationException("Current password is incorrect."); user.setPasswordHash(passwordEncoder.encode(request.newPassword())); refreshTokenService.revokeAll(user.getId()); }
+    @Override @Transactional public void requestPasswordReset(String email) { userRepository.findByEmailAndDeletedAtIsNull(email).ifPresent(accountRecoveryService::createPasswordReset); }
+    @Override @Transactional public void resetPassword(ResetPasswordRequest request) { User user = accountRecoveryService.consumePasswordReset(request.token()); user.setPasswordHash(passwordEncoder.encode(request.newPassword())); refreshTokenService.revokeAll(user.getId()); }
+    @Override @Transactional public void verifyEmail(String token) { accountRecoveryService.consumeVerification(token); }
+    private AuthResponse response(User user) { return new AuthResponse(jwtService.createAccessToken(user), String.valueOf(user.getId()), user.getEmail(), user.getRole(), refreshTokenService.issue(user)); }
 }

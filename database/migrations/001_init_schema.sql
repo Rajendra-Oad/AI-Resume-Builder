@@ -1,9 +1,0 @@
-spring.application.name=ai-resume-builder
-server.port=8080
-spring.jpa.hibernate.ddl-auto=none
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/ai_resume_builder}
-spring.datasource.username=${DB_USERNAME:root}
-spring.datasource.password=${DB_PASSWORD:password}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver

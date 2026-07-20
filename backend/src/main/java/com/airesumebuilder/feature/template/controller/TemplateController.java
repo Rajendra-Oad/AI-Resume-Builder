@@ -1,0 +1,6 @@
+package com.airesumebuilder.feature.template.controller;
+import com.airesumebuilder.common.dto.ApiResponse;import com.airesumebuilder.feature.template.service.TemplateService;import com.airesumebuilder.feature.template.service.TemplateService.TemplateResponse;import com.airesumebuilder.security.CurrentUser;import java.util.List;import org.springframework.http.ResponseEntity;import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/v1/templates") public class TemplateController {private final TemplateService service;private final CurrentUser user;public TemplateController(TemplateService s,CurrentUser u){service=s;user=u;}
+ @GetMapping public ResponseEntity<ApiResponse<List<TemplateResponse>>> list(){return ResponseEntity.ok(ApiResponse.success(service.list(),"Templates retrieved."));}
+ @GetMapping("/{id}") public ResponseEntity<ApiResponse<TemplateResponse>> get(@PathVariable long id){return ResponseEntity.ok(ApiResponse.success(service.get(id),"Template retrieved."));}
+ @PostMapping("/{templateId}/apply/{resumeId}") public ResponseEntity<ApiResponse<Void>> apply(@PathVariable long templateId,@PathVariable long resumeId){service.apply(user.email(),templateId,resumeId);return ResponseEntity.ok(ApiResponse.success(null,"Template applied."));}}

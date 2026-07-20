@@ -1,14 +1,21 @@
 package com.airesumebuilder.common.dto;
 
-import java.time.Instant;
+import com.airesumebuilder.common.web.CorrelationIdContext;
 
-public record ApiResponse<T>(boolean success, T data, String message, Instant timestamp) {
+public record ApiResponse<T>(boolean success, T data, ApiError error, ApiMeta meta, Pagination pagination) {
+    public static <T> ApiResponse<T> success(T data, String ignoredMessage) {
+        return new ApiResponse<>(true, data, null, ApiMeta.current(), null);
+    }
 
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return new ApiResponse<>(true, data, message, Instant.now());
+    public static <T> ApiResponse<T> paginated(T data, Pagination pagination) {
+        return new ApiResponse<>(true, data, null, ApiMeta.current(), pagination);
+    }
+
+    public static <T> ApiResponse<T> error(String code, String message) {
+        return new ApiResponse<>(false, null, new ApiError(code, message, null), ApiMeta.current(), null);
     }
 
     public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(false, null, message, Instant.now());
+        return error("INTERNAL_ERROR", message);
     }
 }

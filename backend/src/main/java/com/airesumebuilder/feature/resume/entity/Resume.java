@@ -20,6 +20,9 @@ public class Resume {
     @Column(length = 2000)
     private String summary;
 
+    @Column(name = "target_job_title", length = 255)
+    private String targetJobTitle;
+
     @Column(nullable = false)
     private String status = "DRAFT";
 
@@ -68,6 +71,14 @@ public class Resume {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getTargetJobTitle() {
+        return targetJobTitle;
+    }
+
+    public void setTargetJobTitle(String targetJobTitle) {
+        this.targetJobTitle = targetJobTitle;
     }
 
     public String getStatus() {

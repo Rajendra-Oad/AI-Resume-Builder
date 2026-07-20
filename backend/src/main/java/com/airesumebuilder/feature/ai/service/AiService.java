@@ -1,5 +1,5 @@
 package com.airesumebuilder.feature.ai.service;
 
-public interface AiService {
-    String generateContent(String prompt);
-}
+import com.airesumebuilder.feature.ai.dto.request.AiGenerationRequest;
+import com.airesumebuilder.feature.ai.dto.response.AiGenerationResponse;
+public interface AiService { AiGenerationResponse generate(String email, AiGenerationRequest request); }

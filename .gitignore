@@ -9,7 +9,6 @@ Thumbs.db
 *.war
 *.ear
 .idea/
-.vscode/
 .classpath
 .project
 .settings/

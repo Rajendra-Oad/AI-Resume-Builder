@@ -1,10 +1,18 @@
-const App = () => {
-  return (
-    <main style={{ fontFamily: "Inter, sans-serif", padding: "2rem" }}>
-      <h1>AI Resume Builder</h1>
-      <p>Frontend scaffold created successfully.</p>
-    </main>
-  );
-};
+import { QueryClientProvider } from "@tanstack/react-query";
+
+import { queryClient } from "./api/queryClient";
+import { AuthProvider } from "./context/AuthContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { AppRoutes } from "./routes";
+
+const App = () => (
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
+);
 
 export default App;

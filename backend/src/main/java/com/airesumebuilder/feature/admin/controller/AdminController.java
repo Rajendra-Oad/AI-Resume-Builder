@@ -1,17 +1,2 @@
-package com.airesumebuilder.feature.admin.controller;
-
-import com.airesumebuilder.common.dto.ApiResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/api/admin")
-public class AdminController {
-
-    @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> health() {
-        return ResponseEntity.ok(ApiResponse.success("ok", "Admin module ready."));
-    }
-}
+package com.airesumebuilder.feature.admin.controller;import com.airesumebuilder.common.dto.*;import com.airesumebuilder.feature.admin.service.AdminService;import com.airesumebuilder.feature.audit.service.AuditService;import com.airesumebuilder.security.CurrentUser;import java.util.List;import org.springframework.http.ResponseEntity;import org.springframework.web.bind.annotation.*;
+@RestController@RequestMapping("/api/v1/admin")public class AdminController{private final AdminService service;private final AuditService audit;private final CurrentUser user;public AdminController(AdminService s,AuditService a,CurrentUser u){service=s;audit=a;user=u;}@GetMapping("/users")public ResponseEntity<ApiResponse<List<AdminService.UserView>>>users(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="20")int size){var r=service.users(page,size);return ResponseEntity.ok(ApiResponse.paginated(r.items(),new Pagination(r.page(),r.size(),r.total(),(int)Math.ceil(r.total()/(double)r.size()))));}@PatchMapping("/users/{id}/status")public ResponseEntity<ApiResponse<AdminService.UserView>>status(@PathVariable long id,@RequestBody AdminService.ChangeRequest r){return ResponseEntity.ok(ApiResponse.success(service.status(user.email(),id,r),"User status updated."));}@PatchMapping("/users/{id}/role")public ResponseEntity<ApiResponse<AdminService.UserView>>role(@PathVariable long id,@RequestBody AdminService.ChangeRequest r){return ResponseEntity.ok(ApiResponse.success(service.role(user.email(),id,r),"User role updated."));}@GetMapping("/actions")public ResponseEntity<ApiResponse<List<AdminService.ActionView>>>actions(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="20")int size){return ResponseEntity.ok(ApiResponse.success(service.actions(page,size),"Admin actions retrieved."));}@GetMapping("/audit")public ResponseEntity<ApiResponse<List<AuditService.AuditEntry>>>audit(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="20")int size){var r=audit.listAll(page,size);return ResponseEntity.ok(ApiResponse.paginated(r.items(),new Pagination(r.page(),r.size(),r.total(),(int)Math.ceil(r.total()/(double)r.size()))));}}
