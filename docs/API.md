@@ -1,28 +1,35 @@
 # API Reference
 
-The public API is versioned from its first release. All application endpoints
-use the `/api/v1` prefix and JSON responses use one consistent envelope.
+The application API is versioned under `/api/v1` and returns JSON through a
+consistent response envelope. The full API design rules live in
+[REST API Architecture](05_REST_API_Architecture.md).
 
-## Core endpoints
+## Conventions
 
-| Method | Path | Authentication |
-|---|---|---|
-| POST | `/api/v1/auth/register` | Public |
-| POST | `/api/v1/auth/login` | Public |
-| GET | `/api/v1/resumes?page=0&size=20` | Bearer token |
-| POST | `/api/v1/resumes` | Bearer token |
-| GET | `/api/v1/resumes/{id}` | Owner bearer token |
-| PUT | `/api/v1/resumes/{id}` | Owner bearer token |
-| DELETE | `/api/v1/resumes/{id}` | Owner bearer token |
+- Successful responses include `success`, `data`, `error`, `meta`, and optional
+  `pagination`.
+- Errors use stable codes such as `VALIDATION_ERROR`, `UNAUTHENTICATED`,
+  `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `UPSTREAM_ERROR`, and `INTERNAL_ERROR`.
+- `meta.correlationId` and `meta.timestamp` are included in API responses.
+- Authenticated routes require a bearer access token unless explicitly public.
 
-Every response includes `meta.correlationId` and `meta.timestamp`. Clients may
-send `X-Correlation-Id`; otherwise the API generates one and returns it in the
-response header and body metadata.
+## Selected Implemented Endpoints
 
-Successful collection responses include `pagination` with `page`, `size`,
-`totalElements`, and `totalPages`. Page numbering starts at zero and size is
-capped at 100.
+| Method | Path | Authentication | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/auth/register` | Public | Create a user account. |
+| POST | `/api/v1/auth/login` | Public | Sign in and receive an access token. |
+| POST | `/api/v1/auth/refresh` | Refresh cookie | Refresh the access token. |
+| POST | `/api/v1/auth/logout` | Refresh cookie | Revoke the refresh token. |
+| GET | `/api/v1/users/me` | Bearer token | Return the signed-in user's profile. |
+| GET | `/api/v1/resumes` | Bearer token | List the signed-in user's resumes. |
+| POST | `/api/v1/resumes` | Bearer token | Create a resume. |
+| GET | `/api/v1/resumes/{id}` | Owner bearer token | Read one resume. |
+| PUT | `/api/v1/resumes/{id}` | Owner bearer token | Update one resume. |
+| DELETE | `/api/v1/resumes/{id}` | Owner bearer token | Delete one resume. |
+| GET | `/api/v1/ats/health` | Bearer token | Check ATS module availability. |
+| GET | `/api/v1/jobs/health` | Bearer token | Check job matching module availability. |
+| GET | `/api/v1/notifications/health` | Bearer token | Check notifications module availability. |
 
-Errors use `error.code` and `error.message`; stable codes include
-`VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`,
-`UPSTREAM_ERROR`, and `INTERNAL_ERROR`.
+For contract expansion rules, versioning policy, and anti-patterns, use
+[REST API Architecture](05_REST_API_Architecture.md).
