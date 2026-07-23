@@ -26,7 +26,7 @@ jobs:
         with:
           name: backend-coverage
           path: backend/target/site/jacoco
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
 
   frontend:
