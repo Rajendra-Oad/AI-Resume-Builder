@@ -10,6 +10,11 @@ import { ModulePage } from "../../../components/ModulePage";
 import { Select } from "../../../components/Select";
 import { completeOnboarding, deleteProfilePhoto, getProfile, getProfilePhoto, sendPhoneOtp, updateProfile, uploadProfilePhoto, verifyPhoneOtp } from "../api/profileApi";
 
+const displayValue = (value) => {
+  const text = value == null ? "" : String(value).trim();
+  return text || "Not provided";
+};
+
 const editableFields = (profile) => ({
   firstName: profile.firstName ?? "",
   lastName: profile.lastName ?? "",
@@ -79,14 +84,35 @@ const ProfileForm = ({ profile }) => {
   return (
     <Card>
       <section className="profile-photo-editor" aria-labelledby="profile-photo-title"><div className="profile-avatar">{photo.data?<img src={photo.data} alt="Your profile"/>:<span>{(values.firstName[0]||"").toUpperCase()}{(values.lastName[0]||"").toUpperCase()}</span>}</div><div><h2 id="profile-photo-title">Profile photo</h2><p className="muted">JPEG, PNG, or WebP. Maximum 5 MB.</p><div className="profile-photo-actions"><label className="button button--secondary">{photoMutation.isPending?"Uploading…":"Upload photo"}<Input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={photoMutation.isPending} onChange={(event)=>{const file=event.target.files?.[0];if(file)photoMutation.mutate(file);event.target.value="";}}/></label>{profile.photoUrl&&<Button type="button" variant="ghost" disabled={deletePhoto.isPending} onClick={()=>deletePhoto.mutate()}>Remove</Button>}</div></div></section>
+      <h2>Account details</h2>
       <dl className="detail-list">
         <div>
+          <dt>Account ID</dt>
+          <dd>{displayValue(profile.id)}</dd>
+        </div>
+        <div>
+          <dt>Name</dt>
+          <dd>{displayValue([profile.firstName, profile.lastName].filter(Boolean).join(" "))}</dd>
+        </div>
+        <div>
+          <dt>Display name</dt>
+          <dd>{displayValue(profile.displayName)}</dd>
+        </div>
+        <div>
           <dt>Email</dt>
-          <dd>{profile.email || "Not available"}</dd>
+          <dd>{displayValue(profile.email)}</dd>
         </div>
         <div>
           <dt>Account role</dt>
-          <dd>{profile.role || "USER"}</dd>
+          <dd>{displayValue(profile.role)}</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>{displayValue(profile.phone)}</dd>
+        </div>
+        <div>
+          <dt>Location</dt>
+          <dd>{displayValue(profile.location)}</dd>
         </div>
       </dl>
 
