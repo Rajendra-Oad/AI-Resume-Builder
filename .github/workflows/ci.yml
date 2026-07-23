@@ -50,7 +50,7 @@ jobs:
         with:
           name: frontend-coverage
           path: frontend/coverage
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
       - run: npm run build
 

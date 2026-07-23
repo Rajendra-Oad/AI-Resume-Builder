@@ -7,4 +7,9 @@ describe("Button", () => {
     render(<Button>Save resume</Button>);
     expect(screen.getByRole("button", { name: "Save resume" })).toBeInTheDocument();
   });
+
+  it("uses the primary style for an unknown variant", () => {
+    render(<Button variant="unknown">Save resume</Button>);
+    expect(screen.getByRole("button", { name: "Save resume" })).toHaveClass("bg-brand");
+  });
 });

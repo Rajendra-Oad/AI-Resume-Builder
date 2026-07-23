@@ -9,8 +9,8 @@ import { Checkbox } from "../../../components/Checkbox";
 import { ModulePage } from "../../../components/ModulePage";
 import { ListSkeleton } from "../../../components/Skeleton";
 import {
-  listNotifications,
   getNotificationPreferences,
+  listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
   updateNotificationPreferences,
