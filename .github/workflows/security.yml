@@ -58,13 +58,17 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      - name: Cache Dependency-Check vulnerability data
-        uses: actions/cache@v4
+      - name: Set Dependency-Check cache key
+        id: dependency-check-cache-key
+        run: echo "date=$(date -u +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+      - name: Restore Dependency-Check vulnerability data
+        id: dependency-check-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.m2/repository/org/owasp/dependency-check-data
-          key: dependency-check-${{ runner.os }}-${{ github.run_id }}
+          path: backend/.dependency-check-data
+          key: dependency-check-${{ runner.os }}-12.2.2-${{ steps.dependency-check-cache-key.outputs.date }}
           restore-keys: |
-            dependency-check-${{ runner.os }}-
+            dependency-check-${{ runner.os }}-12.2.2-
       - name: Fail on dependencies with CVSS 7 or higher
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
@@ -73,7 +77,14 @@ jobs:
           org.owasp:dependency-check-maven:12.2.2:check
           -DfailBuildOnCVSS=7
           -Dformats=HTML,JSON
+          -DdataDirectory="${GITHUB_WORKSPACE}/backend/.dependency-check-data"
           -DnvdApiKeyEnvironmentVariable=NVD_API_KEY
+      - name: Save Dependency-Check vulnerability data
+        if: always() && steps.dependency-check-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: backend/.dependency-check-data
+          key: dependency-check-${{ runner.os }}-12.2.2-${{ steps.dependency-check-cache-key.outputs.date }}
       - name: Upload Dependency-Check reports
         if: always()
         uses: actions/upload-artifact@v4
