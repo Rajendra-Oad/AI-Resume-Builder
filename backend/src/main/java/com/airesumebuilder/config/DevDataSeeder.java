@@ -71,6 +71,9 @@ public class DevDataSeeder implements ApplicationRunner {
         user.setLastName(lastName);
         user.setRole(role);
         user.setStatus("ACTIVE");
+        user.setPersona("USER".equals(role) ? "PROFESSIONAL" : null);
+        user.setCareerGoal("USER".equals(role) ? "IMPROVE_RESUME" : null);
+        user.setOnboardingCompleted(true);
         user.setVerifiedAt(Instant.now());
         user.setDeletedAt(null);
         user.setFailedLoginAttempts(0);

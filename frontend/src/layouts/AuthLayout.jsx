@@ -1,4 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
+
 import { AppIcon } from "../components/AppIcon";
 
 export const AuthLayout = () => (

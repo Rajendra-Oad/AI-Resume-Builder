@@ -4,7 +4,9 @@ import com.airesumebuilder.common.dto.ApiResponse;
 import com.airesumebuilder.common.dto.Pagination;
 import com.airesumebuilder.feature.resume.dto.request.CreateResumeRequest;
 import com.airesumebuilder.feature.resume.dto.request.UpdateResumeRequest;
+import com.airesumebuilder.feature.resume.dto.request.PatchResumeRequest;
 import com.airesumebuilder.feature.resume.dto.response.ResumeResponse;
+import com.airesumebuilder.feature.resume.dto.response.DeletedResumeResponse;
 import com.airesumebuilder.feature.resume.service.ResumeService;
 import com.airesumebuilder.security.CurrentUser;
 import jakarta.validation.Valid;
@@ -42,6 +44,19 @@ public class ResumeController {
             new Pagination(result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages())));
     }
 
+    @GetMapping("/deleted")
+    public ResponseEntity<ApiResponse<java.util.List<DeletedResumeResponse>>> listDeletedResumes(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size
+    ) {
+        int boundedPage = Math.max(0, page);
+        int boundedSize = Math.min(Math.max(1, size), 100);
+        Page<DeletedResumeResponse> result = resumeService.listDeletedResumes(
+            currentUser.email(), PageRequest.of(boundedPage, boundedSize, Sort.by(Sort.Direction.DESC, "deletedAt")));
+        return ResponseEntity.ok(ApiResponse.paginated(result.getContent(),
+            new Pagination(result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages())));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ResumeResponse>> createResume(@Valid @RequestBody CreateResumeRequest request) {
         ResumeResponse response = resumeService.createResume(currentUser.email(), request);
@@ -57,6 +72,23 @@ public class ResumeController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ResumeResponse>> updateResume(@PathVariable Long id, @Valid @RequestBody UpdateResumeRequest request) {
         return ResponseEntity.ok(ApiResponse.success(resumeService.updateResume(currentUser.email(), id, request), "Resume updated successfully."));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<ResumeResponse>> patchResume(@PathVariable Long id,@Valid @RequestBody PatchResumeRequest request){return ResponseEntity.ok(ApiResponse.success(resumeService.patchResume(currentUser.email(),id,request),"Resume metadata updated."));}
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<ApiResponse<ResumeResponse>> publish(@PathVariable Long id){return ResponseEntity.ok(ApiResponse.success(resumeService.publishResume(currentUser.email(),id),"Resume published."));}
+
+    @PostMapping("/{id}/duplicate")
+    public ResponseEntity<ApiResponse<ResumeResponse>> duplicateResume(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse.success(resumeService.duplicateResume(currentUser.email(), id), "Resume duplicated successfully."));
+    }
+
+    @PostMapping("/{id}/restore")
+    public ResponseEntity<ApiResponse<ResumeResponse>> restoreResume(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(resumeService.restoreResume(currentUser.email(), id), "Resume restored successfully."));
     }
 
     @DeleteMapping("/{id}")

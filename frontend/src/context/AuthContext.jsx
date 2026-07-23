@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { authSession } from "../services/authSession";
+
 import { logout, refreshSession } from "../features/auth/api/authApi";
+import { authSession } from "../services/authSession";
 
 const AuthContext = createContext(null);
 

@@ -24,6 +24,17 @@ public class UserProfile {
     @Column(length = 255)
     private String location;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "photo_data", columnDefinition = "MEDIUMBLOB")
+    private byte[] photoData;
+
+    @Column(name = "photo_content_type", length = 100)
+    private String photoContentType;
+
+    @Column(name = "photo_file_name", length = 255)
+    private String photoFileName;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -76,4 +87,11 @@ public class UserProfile {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    public byte[] getPhotoData() { return photoData; }
+    public void setPhotoData(byte[] photoData) { this.photoData = photoData; }
+    public String getPhotoContentType() { return photoContentType; }
+    public void setPhotoContentType(String photoContentType) { this.photoContentType = photoContentType; }
+    public String getPhotoFileName() { return photoFileName; }
+    public void setPhotoFileName(String photoFileName) { this.photoFileName = photoFileName; }
 }

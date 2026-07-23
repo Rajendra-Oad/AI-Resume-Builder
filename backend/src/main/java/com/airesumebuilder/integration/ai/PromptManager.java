@@ -1,18 +1,18 @@
 package com.airesumebuilder.integration.ai;
 
 import com.airesumebuilder.common.exception.ValidationException;
+import com.airesumebuilder.feature.ai.repository.AiPromptRepository;
 import java.util.List;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /** Resolves only published, versioned prompt content from persistence. */
 @Component
 public class PromptManager {
-    private final JdbcTemplate jdbc;
-    public PromptManager(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+    private final AiPromptRepository prompts;
+    public PromptManager(AiPromptRepository prompts) { this.prompts = prompts; }
     public String resolve(String workflow, String locale) {
-        List<String> prompts = jdbc.query("SELECT system_instruction FROM ai_prompt_templates WHERE workflow=? AND locale=? AND status='PUBLISHED' ORDER BY version DESC LIMIT 1", (rs, row) -> rs.getString(1), workflow, locale == null || locale.isBlank() ? "en-US" : locale);
-        if (prompts.isEmpty()) throw new ValidationException("No published AI prompt exists for this workflow.");
-        return prompts.getFirst();
+        List<String> instructions = prompts.findPublishedInstructions(workflow, locale == null || locale.isBlank() ? "en-US" : locale);
+        if (instructions.isEmpty()) throw new ValidationException("No published AI prompt exists for this workflow.");
+        return instructions.getFirst();
     }
 }

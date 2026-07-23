@@ -26,18 +26,26 @@ class FlywayMigrationIT {
 
         MigrateResult result = flyway.migrate();
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(8);
+        int expectedMigrationCount = flyway.info().all().length;
+        assertThat(result.migrationsExecuted).isEqualTo(expectedMigrationCount);
         flyway.validate();
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
-            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=1")).isEqualTo(8);
+            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=1"))
+                .isEqualTo(expectedMigrationCount);
             assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.tables "
                 + "WHERE table_schema=DATABASE() AND table_name IN "
                 + "('users','resumes','ai_requests','ai_prompt_templates','ai_jobs','user_ai_provider_credentials')"))
                 .isEqualTo(6);
             assertThat(count(statement, "SELECT COUNT(*) FROM ai_providers WHERE provider_key IN ('gemini','openai')"))
                 .isEqualTo(2);
+            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() "
+                + "AND table_name='resumes' AND column_name IN ('skills_content','font_family','page_margin')"))
+                .isEqualTo(3);
+            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() "
+                + "AND table_name='users' AND column_name IN ('persona','career_goal','onboarding_completed')"))
+                .isEqualTo(3);
         }
     }
 

@@ -54,8 +54,18 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         validateSmtp(environment, errors);
         validateRedis(environment, errors);
         validateDevelopmentSeed(environment, errors);
+        validateOtp(environment, errors, production);
         validateProduction(environment, errors, production);
         return errors;
+    }
+
+    private static void validateOtp(ConfigurableEnvironment environment,List<String> errors,boolean production){
+        String provider=environment.getProperty("OTP_PROVIDER","fake").trim().toLowerCase();
+        if(!Set.of("fake","msg91","android-gateway","textbee").contains(provider)) errors.add("OTP_PROVIDER must be one of: fake, msg91, android-gateway, textbee.");
+        if(production&&!"msg91".equals(provider)) errors.add("OTP_PROVIDER must be msg91 in the prod profile; local OTP providers are development-only.");
+        if("msg91".equals(provider)){require(environment,errors,"MSG91_AUTH_KEY","MSG91 backend authentication key");require(environment,errors,"MSG91_TEMPLATE_ID","DLT-approved MSG91 OTP template ID");}
+        if("android-gateway".equals(provider)){require(environment,errors,"ANDROID_SMS_GATEWAY_URL","Android SMS gateway send endpoint");url(environment,errors,"ANDROID_SMS_GATEWAY_URL",false);}
+        if("textbee".equals(provider)){require(environment,errors,"TEXTBEE_API_KEY","TextBee API key");require(environment,errors,"TEXTBEE_DEVICE_ID","registered TextBee Android device ID");url(environment,errors,"TEXTBEE_BASE_URL",false);}
     }
 
     private static void validateEncryptionKey(ConfigurableEnvironment environment, List<String> errors) {

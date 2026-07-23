@@ -1,12 +1,15 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+
 import { PageLoader } from "../components/PageLoader";
+import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { RouteFocusManager } from "../components/RouteFocusManager";
 import { adminRoutes } from "../features/admin/routes";
 import { aiAssistantRoutes } from "../features/aiAssistant/routes";
 import { atsRoutes } from "../features/ats/routes";
 import { authRoutes } from "../features/auth/routes";
 import { coverLetterRoutes } from "../features/coverLetter/routes";
+import { dashboardRoutes } from "../features/dashboard/routes";
 import { jobMatchingRoutes } from "../features/jobMatching/routes";
 import { notificationRoutes } from "../features/notifications/routes";
 import { profileRoutes } from "../features/profile/routes";
@@ -17,12 +20,10 @@ import { AuthLayout } from "../layouts/AuthLayout";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { AdminRoute } from "./AdminRoute";
 import { GuestRoute } from "./GuestRoute";
+import { OnboardingGate } from "./OnboardingGate";
 import { ProtectedRoute } from "./ProtectedRoute";
 const LandingPage = lazy(() =>
   import("../pages/LandingPage").then((module) => ({ default: module.LandingPage })),
-);
-const DashboardPage = lazy(() =>
-  import("../pages/DashboardPage").then((module) => ({ default: module.DashboardPage })),
 );
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((module) => ({ default: module.NotFoundPage })),
@@ -30,39 +31,73 @@ const NotFoundPage = lazy(() =>
 const ForbiddenPage = lazy(() =>
   import("../pages/ForbiddenPage").then((module) => ({ default: module.ForbiddenPage })),
 );
+const OnboardingPage = lazy(() =>
+  import("../pages/OnboardingPage").then((module) => ({ default: module.OnboardingPage })),
+);
 const RouteRoot = () => (
   <Suspense fallback={<PageLoader />}>
     <RouteFocusManager />
     <Outlet />
   </Suspense>
 );
+const withFeatureBoundary = (featureName, children) => ({
+  element: (
+    <RouteErrorBoundary featureName={featureName}>
+      <Outlet />
+    </RouteErrorBoundary>
+  ),
+  children,
+});
+
 const featureRoutes = [
-  ...resumeRoutes,
-  ...templateRoutes,
-  ...atsRoutes,
-  ...jobMatchingRoutes,
-  ...coverLetterRoutes,
-  ...notificationRoutes,
-  ...profileRoutes,
-  ...settingsRoutes,
-  ...aiAssistantRoutes,
+  withFeatureBoundary("Resume workspace", resumeRoutes),
+  withFeatureBoundary("Templates", templateRoutes),
+  withFeatureBoundary("ATS workspace", atsRoutes),
+  withFeatureBoundary("Job matching", jobMatchingRoutes),
+  withFeatureBoundary("Cover letters", coverLetterRoutes),
+  withFeatureBoundary("Notifications", notificationRoutes),
+  withFeatureBoundary("Profile", profileRoutes),
+  withFeatureBoundary("Settings", settingsRoutes),
+  withFeatureBoundary("AI assistant", aiAssistantRoutes),
 ];
 const router = createBrowserRouter([
   {
     element: <RouteRoot />,
     children: [
       { index: true, element: <LandingPage /> },
-      { element: <GuestRoute />, children: [{ element: <AuthLayout />, children: authRoutes }] },
+      {
+        element: <GuestRoute />,
+        children: [
+          {
+            element: <AuthLayout />,
+            children: [withFeatureBoundary("Authentication", authRoutes)],
+          },
+        ],
+      },
       {
         element: <ProtectedRoute />,
         children: [
           {
-            element: <DashboardLayout />,
-            children: [
-              { path: "dashboard", element: <DashboardPage /> },
-              ...featureRoutes,
-              { element: <AdminRoute />, children: adminRoutes },
-            ],
+            path: "onboarding",
+            element: (
+              <RouteErrorBoundary featureName="Onboarding">
+                <OnboardingPage />
+              </RouteErrorBoundary>
+            ),
+          },
+          {
+            element: <OnboardingGate />,
+            children: [{
+              element: <DashboardLayout />,
+              children: [
+                withFeatureBoundary("Dashboard", dashboardRoutes),
+                ...featureRoutes,
+                {
+                  element: <AdminRoute />,
+                  children: [withFeatureBoundary("Admin", adminRoutes)],
+                },
+              ],
+            }],
           },
         ],
       },

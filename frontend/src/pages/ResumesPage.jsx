@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { Button } from "../components/Button";
+
 import { AppIcon } from "../components/AppIcon";
-import { PageLoader } from "../components/PageLoader";
+import { Button } from "../components/Button";
+import { CardSkeleton } from "../components/Skeleton";
 import { ResumeCard, useResumes } from "../features/resume";
 
 export const ResumesPage = () => {
   const { data: resumes, error, isLoading } = useResumes();
-  if (isLoading) return <PageLoader />;
   return (
     <div className="dashboard-page">
       <header className="page-header">
@@ -15,11 +15,12 @@ export const ResumesPage = () => {
           <h1>My resumes</h1>
           <p className="muted">Create, refine, and tailor your applications.</p>
         </div>
-        <Link to="/resumes/new">
-          <Button>+ New resume</Button>
-        </Link>
+        <div className="page-header__actions">
+          <Link to="/resumes/deleted"><Button variant="secondary">Recently deleted</Button></Link>
+          <Link to="/resumes/new"><Button>+ New resume</Button></Link>
+        </div>
       </header>
-      {error ? (
+      {isLoading ? <CardSkeleton count={6} className="resume-grid" /> : error ? (
         <div className="notice notice--error">{error}</div>
       ) : resumes.length ? (
         <div className="resume-grid">

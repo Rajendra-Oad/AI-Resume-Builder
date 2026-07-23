@@ -2,6 +2,7 @@ package com.airesumebuilder.feature.auth.service.impl;
 
 import com.airesumebuilder.feature.auth.dto.request.RegisterRequest;
 import com.airesumebuilder.feature.auth.dto.response.AuthResponse;
+import com.airesumebuilder.feature.auth.dto.response.RegistrationResponse;
 import com.airesumebuilder.feature.auth.entity.User;
 import com.airesumebuilder.feature.auth.repository.UserRepository;
 import com.airesumebuilder.security.JwtService;
@@ -49,20 +50,22 @@ class AuthServiceImplTest {
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("secret-password-123")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(refreshTokenService.issue(any(User.class))).thenReturn("refresh-token");
 
-        AuthResponse response = authService.register(new RegisterRequest("Ada", "Lovelace", "test@example.com", "secret-password-123"));
+        RegistrationResponse response = authService.register(new RegisterRequest("Ada", "Lovelace", "test@example.com", "+91 98765 43210", "secret-password-123"));
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
+        assertEquals("+919876543210", userCaptor.getValue().getPhone());
 
         User savedUser = userCaptor.getValue();
         assertEquals("Ada", savedUser.getFirstName());
         assertEquals("Lovelace", savedUser.getLastName());
         assertEquals("test@example.com", savedUser.getEmail());
         assertEquals("encoded-password", savedUser.getPasswordHash());
-        assertNotNull(response.accessToken());
+        assertEquals("PENDING_VERIFICATION", savedUser.getStatus());
+        assertEquals(null, savedUser.getVerifiedAt());
         assertEquals("test@example.com", response.email());
+        verify(accountRecoveryService).createVerification(savedUser);
     }
 
     @Test

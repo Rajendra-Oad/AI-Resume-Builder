@@ -1,0 +1,4 @@
+package com.airesumebuilder.feature.analytics.entity;
+import jakarta.persistence.*; import java.time.*; import lombok.*;
+@Entity @Table(name="usage_metrics",uniqueConstraints=@UniqueConstraint(name="uk_usage_metrics_rollup",columnNames={"metric_date","metric_name","dimension_key"})) @Getter @Setter @NoArgsConstructor
+public class UsageMetric { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @Column(name="metric_date",nullable=false) private LocalDate metricDate; @Column(name="metric_name",nullable=false,length=100) private String metricName; @Column(name="dimension_key",nullable=false,length=150) private String dimensionKey=""; @Column(name="metric_value",nullable=false) private Long metricValue=0L; @Column(name="created_at",nullable=false,updatable=false) private Instant createdAt; @PrePersist void create(){if(createdAt==null)createdAt=Instant.now();} }
