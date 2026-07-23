@@ -26,12 +26,14 @@ class FlywayMigrationIT {
 
         MigrateResult result = flyway.migrate();
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(11);
+        int expectedMigrationCount = flyway.info().all().length;
+        assertThat(result.migrationsExecuted).isEqualTo(expectedMigrationCount);
         flyway.validate();
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
-            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=1")).isEqualTo(11);
+            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=1"))
+                .isEqualTo(expectedMigrationCount);
             assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.tables "
                 + "WHERE table_schema=DATABASE() AND table_name IN "
                 + "('users','resumes','ai_requests','ai_prompt_templates','ai_jobs','user_ai_provider_credentials')"))

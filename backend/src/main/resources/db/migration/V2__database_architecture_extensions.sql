@@ -17,9 +17,6 @@ ALTER TABLE resumes
     ADD COLUMN template_id BIGINT NULL AFTER user_id,
     ADD CONSTRAINT fk_resumes_template FOREIGN KEY (template_id) REFERENCES templates(id);
 
-ALTER TABLE refresh_tokens
-    ADD CONSTRAINT uk_refresh_tokens_hash UNIQUE (token_hash);
-
 CREATE TABLE resume_versions (
     id BIGINT NOT NULL AUTO_INCREMENT,
     resume_id BIGINT NOT NULL,
