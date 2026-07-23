@@ -6,18 +6,21 @@ const LoginPage = lazy(() =>
 const RegisterPage = lazy(() =>
   import("../../pages/RegisterPage").then((module) => ({ default: module.RegisterPage })),
 );
-const ForgotPasswordPage = lazy(() =>
-  import("../../pages/ForgotPasswordPage").then((module) => ({
-    default: module.ForgotPasswordPage,
-  })),
+const ForgotPasswordForm = lazy(() =>
+  import("./components/ForgotPasswordForm").then((module) => ({ default: module.ForgotPasswordForm })),
 );
-const ResetPasswordPage = lazy(() =>
-  import("../../pages/ResetPasswordPage").then((module) => ({ default: module.ResetPasswordPage })),
+const ResetPasswordForm = lazy(() =>
+  import("./components/ResetPasswordForm").then((module) => ({ default: module.ResetPasswordForm })),
+);
+const VerifyEmailForm = lazy(() =>
+  import("./components/VerifyEmailForm").then((module) => ({ default: module.VerifyEmailForm })),
 );
 
 export const authRoutes = [
   { path: "login", element: <LoginPage /> },
   { path: "register", element: <RegisterPage /> },
-  { path: "forgot-password", element: <ForgotPasswordPage /> },
-  { path: "reset-password", element: <ResetPasswordPage /> },
+  { path: "forgot-password", element: <ForgotPasswordForm /> },
+  { path: "reset-password", element: <ResetPasswordForm /> },
+  { path: "verify-email", element: <VerifyEmailForm /> },
+  { path: "verify-email-sent", element: <VerifyEmailForm sent /> },
 ];

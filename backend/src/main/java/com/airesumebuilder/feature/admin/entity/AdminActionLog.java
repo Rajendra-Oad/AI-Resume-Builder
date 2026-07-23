@@ -1,0 +1,4 @@
+package com.airesumebuilder.feature.admin.entity;
+import com.airesumebuilder.feature.auth.entity.User; import jakarta.persistence.*; import java.time.Instant; import lombok.*;
+@Entity @Table(name="admin_action_logs") @Getter @Setter @NoArgsConstructor
+public class AdminActionLog { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="admin_user_id",nullable=false) private User adminUser; @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="target_user_id") private User targetUser; @Column(nullable=false,length=100) private String action; @Column(columnDefinition="json") private String details; @Column(name="created_at",nullable=false,updatable=false) private Instant createdAt; @PrePersist void create(){if(createdAt==null)createdAt=Instant.now();} }

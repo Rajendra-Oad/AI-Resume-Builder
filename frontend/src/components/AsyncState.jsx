@@ -1,9 +1,9 @@
 import { Button } from "./Button";
 import { Skeleton } from "./Skeleton";
 
-export const AsyncState = ({ error, isLoading, onRetry, children }) => {
+export const AsyncState = ({ error, isLoading, onRetry, children, fallback }) => {
   if (isLoading)
-    return (
+    return fallback ?? (
       <div className="skeleton-stack">
         <Skeleton />
         <Skeleton />

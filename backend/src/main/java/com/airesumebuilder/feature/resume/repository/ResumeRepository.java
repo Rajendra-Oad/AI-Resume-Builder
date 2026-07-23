@@ -8,10 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.Instant;
 
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Long> {
     Page<Resume> findByUserEmailAndDeletedAtIsNull(String email, Pageable pageable);
 
     Optional<Resume> findByIdAndUserEmailAndDeletedAtIsNull(Long id, String email);
+
+    Page<Resume> findByUserEmailAndDeletedAtIsNotNullAndDeletedAtAfter(String email, Instant cutoff, Pageable pageable);
+
+    Optional<Resume> findByIdAndUserEmailAndDeletedAtIsNotNull(Long id, String email);
 }

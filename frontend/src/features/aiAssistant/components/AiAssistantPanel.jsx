@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { AsyncState } from "../../../components/AsyncState";
 import { Card } from "../../../components/Card";
 import { ModulePage } from "../../../components/ModulePage";
-import { getAiUsage } from "../api/aiAssistantApi";
 import { AiProviderSettings } from "../../settings";
+import { getAiUsage } from "../api/aiAssistantApi";
 export const AiAssistantPanel = () => {
   const query = useQuery({ queryKey: ["ai-usage"], queryFn: getAiUsage });
   return (

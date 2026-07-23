@@ -42,6 +42,7 @@ public class AccountRecoveryService {
         entry.setUsedAt(Instant.now()); return entry.getUser();
     }
     @Transactional public void createVerification(User user) {
+        verificationTokens.findByUserIdAndUsedAtIsNull(user.getId()).forEach(token -> token.setUsedAt(Instant.now()));
         String raw = newToken(); EmailVerificationToken entry = new EmailVerificationToken();
         entry.setUser(user); entry.setTokenHash(hash(raw)); entry.setExpiresAt(Instant.now().plus(Duration.ofHours(24))); verificationTokens.save(entry);
         emailService.sendActionEmail(user.getEmail(), "Verify your AI Resume Builder email", "Verify your email", "Confirm your email address to secure your AI Resume Builder account.", "Verify email", appUrl + "/verify-email?token=" + raw, "in 24 hours");

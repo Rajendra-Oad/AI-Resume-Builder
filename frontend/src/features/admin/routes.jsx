@@ -1,5 +1,5 @@
 import { lazy } from "react";
-const PromptAdminPanel = lazy(() =>
-  import("./components/PromptAdminPanel").then((module) => ({ default: module.PromptAdminPanel })),
+const AdminManagementPanel = lazy(() =>
+  import("./components/AdminManagementPanel").then((module) => ({ default: module.AdminManagementPanel })),
 );
-export const adminRoutes = [{ path: "admin", element: <PromptAdminPanel /> }];
+export const adminRoutes = [{ path: "admin", element: <AdminManagementPanel /> }];

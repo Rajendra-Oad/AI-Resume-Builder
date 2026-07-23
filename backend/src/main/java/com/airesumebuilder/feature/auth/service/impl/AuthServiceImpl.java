@@ -5,6 +5,7 @@ import com.airesumebuilder.common.exception.ConflictException;
 import com.airesumebuilder.feature.auth.dto.request.LoginRequest;
 import com.airesumebuilder.feature.auth.dto.request.RegisterRequest;
 import com.airesumebuilder.feature.auth.dto.response.AuthResponse;
+import com.airesumebuilder.feature.auth.dto.response.RegistrationResponse;
 import com.airesumebuilder.feature.auth.entity.User;
 import com.airesumebuilder.feature.auth.repository.UserRepository;
 import com.airesumebuilder.feature.auth.service.AuthService;
@@ -12,12 +13,14 @@ import com.airesumebuilder.security.JwtService;
 import com.airesumebuilder.security.RefreshTokenService;
 import com.airesumebuilder.feature.auth.dto.request.ChangePasswordRequest;
 import com.airesumebuilder.feature.auth.dto.request.ResetPasswordRequest;
+import com.airesumebuilder.feature.auth.dto.request.ResendVerificationRequest;
 import com.airesumebuilder.security.AccountRecoveryService;
 import java.time.Duration;
 import java.time.Instant;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.airesumebuilder.feature.auth.phone.PhoneNumbers;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -38,29 +41,38 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public RegistrationResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ConflictException("Email already registered.");
+        }
+        String phone = request.phone() == null || request.phone().isBlank()
+            ? null
+            : PhoneNumbers.normalize(request.phone());
+        if (phone != null && userRepository.existsByPhone(phone)) {
+            throw new ConflictException("Phone number already registered.");
         }
 
         User user = new User();
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
+        user.setPhone(phone);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole("USER");
-        user.setStatus("ACTIVE");
-        user.setVerifiedAt(Instant.now());
+        user.setStatus("PENDING_VERIFICATION");
 
         User savedUser = userRepository.save(user);
-
-        return response(savedUser);
+        accountRecoveryService.createVerification(savedUser);
+        return new RegistrationResponse(String.valueOf(savedUser.getId()), savedUser.getEmail(), savedUser.getStatus());
     }
 
     @Override
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        String identifier=request.identifier().trim();
+        User user = (identifier.contains("@")
+            ? userRepository.findByEmail(identifier.toLowerCase())
+            : userRepository.findByPhoneAndPhoneVerifiedAtIsNotNullAndDeletedAtIsNull(PhoneNumbers.normalize(identifier)))
             .orElseThrow(() -> new AuthenticationException("Invalid email or password."));
 
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) throw new AuthenticationException("This account is temporarily locked. Try again later.");
@@ -82,5 +94,10 @@ public class AuthServiceImpl implements AuthService {
     @Override @Transactional public void requestPasswordReset(String email) { userRepository.findByEmailAndDeletedAtIsNull(email).ifPresent(accountRecoveryService::createPasswordReset); }
     @Override @Transactional public void resetPassword(ResetPasswordRequest request) { User user = accountRecoveryService.consumePasswordReset(request.token()); user.setPasswordHash(passwordEncoder.encode(request.newPassword())); refreshTokenService.revokeAll(user.getId()); }
     @Override @Transactional public void verifyEmail(String token) { accountRecoveryService.consumeVerification(token); }
+    @Override @Transactional public void resendVerification(ResendVerificationRequest request) {
+        userRepository.findByEmailAndDeletedAtIsNull(request.email().trim().toLowerCase())
+            .filter(user -> "PENDING_VERIFICATION".equals(user.getStatus()))
+            .ifPresent(accountRecoveryService::createVerification);
+    }
     private AuthResponse response(User user) { return new AuthResponse(jwtService.createAccessToken(user), String.valueOf(user.getId()), user.getEmail(), user.getRole(), refreshTokenService.issue(user)); }
 }

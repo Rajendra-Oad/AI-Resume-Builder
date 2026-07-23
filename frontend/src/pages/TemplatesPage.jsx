@@ -4,7 +4,7 @@ export const TemplatesPage = () => (
   <ModulePage
     eyebrow="DESIGN LIBRARY"
     title="Templates"
-    description="Preview layouts prepared for the template API."
+    description="Choose an active layout and apply it directly to one of your resumes."
   >
     <TemplateGallery />
   </ModulePage>

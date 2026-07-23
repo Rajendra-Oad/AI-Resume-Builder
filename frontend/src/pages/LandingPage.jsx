@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Button } from "../components/Button";
+
 import { AppIcon } from "../components/AppIcon";
+import { Button } from "../components/Button";
 
 export const LandingPage = () => (
   <main className="landing">

@@ -1,10 +1,10 @@
 export const Table = ({ columns, rows, rowKey = "id", emptyMessage = "No records found." }) => (
-  <div className="table-wrap">
-    <table>
+  <div className="table-wrap overflow-auto">
+    <table className="w-full border-collapse">
       <thead>
         <tr>
           {columns.map((column) => (
-            <th key={column.key} scope="col">
+            <th className="border-b border-border p-3 text-left text-xs text-ink-subtle uppercase" key={column.key} scope="col">
               {column.label}
             </th>
           ))}
@@ -15,13 +15,13 @@ export const Table = ({ columns, rows, rowKey = "id", emptyMessage = "No records
           rows.map((row) => (
             <tr key={row[rowKey]}>
               {columns.map((column) => (
-                <td key={column.key}>{column.render ? column.render(row) : row[column.key]}</td>
+                <td className="border-b border-border p-3 text-left" key={column.key}>{column.render ? column.render(row) : row[column.key]}</td>
               ))}
             </tr>
           ))
         ) : (
           <tr>
-            <td colSpan={columns.length}>{emptyMessage}</td>
+            <td className="border-b border-border p-3 text-left" colSpan={columns.length}>{emptyMessage}</td>
           </tr>
         )}
       </tbody>

@@ -1,0 +1,4 @@
+package com.airesumebuilder.feature.notification.entity;
+import com.airesumebuilder.feature.auth.entity.User; import jakarta.persistence.*; import java.time.Instant; import lombok.*;
+@Entity @Table(name="notifications") @Getter @Setter @NoArgsConstructor
+public class Notification { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="user_id",nullable=false) private User user; @Column(nullable=false,length=80) private String type; @Column(nullable=false,length=255) private String title; @Lob @Column(columnDefinition="TEXT") private String body; @Column(nullable=false,length=20) private String status="PENDING"; @Column(name="read_at") private Instant readAt; @Column(name="created_at",nullable=false,updatable=false) private Instant createdAt; @PrePersist void create(){if(createdAt==null)createdAt=Instant.now();} }

@@ -1,12 +1,197 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+
 import { AsyncState } from "../../../components/AsyncState";
+import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
+import { FormField } from "../../../components/FormField";
+import { Input } from "../../../components/Input";
 import { ModulePage } from "../../../components/ModulePage";
-import { useAuth } from "../../../context/AuthContext";
-import { getProfile } from "../api/profileApi";
+import { Select } from "../../../components/Select";
+import { completeOnboarding, deleteProfilePhoto, getProfile, getProfilePhoto, sendPhoneOtp, updateProfile, uploadProfilePhoto, verifyPhoneOtp } from "../api/profileApi";
+
+const editableFields = (profile) => ({
+  firstName: profile.firstName ?? "",
+  lastName: profile.lastName ?? "",
+  displayName: profile.displayName ?? "",
+  phone: profile.phone ?? "",
+  location: profile.location ?? "",
+  persona: profile.persona ?? "PROFESSIONAL",
+  careerGoal: profile.careerGoal ?? "IMPROVE_RESUME",
+});
+
+const ProfileForm = ({ profile }) => {
+  const queryClient = useQueryClient();
+  const [values, setValues] = useState(() => editableFields(profile));
+  const [message, setMessage] = useState("");
+  const [otp, setOtp] = useState("");
+  const [developmentCode, setDevelopmentCode] = useState("");
+  const [resendSeconds, setResendSeconds] = useState(0);
+  const photo = useQuery({ queryKey:["profile-photo"],queryFn:getProfilePhoto,enabled:Boolean(profile.photoUrl),select:(blob)=>window.URL.createObjectURL(blob) });
+  useEffect(()=>()=>{if(photo.data)window.URL.revokeObjectURL(photo.data);},[photo.data]);
+  const photoMutation=useMutation({mutationFn:uploadProfilePhoto,onSuccess:async(saved)=>{queryClient.setQueryData(["profile"],saved);await queryClient.invalidateQueries({queryKey:["profile-photo"]});setMessage("Profile photo updated.");},onError:(error)=>setMessage(error.message)});
+  const deletePhoto=useMutation({mutationFn:deleteProfilePhoto,onSuccess:async()=>{await queryClient.invalidateQueries({queryKey:["profile"]});queryClient.removeQueries({queryKey:["profile-photo"]});setMessage("Profile photo removed.");}});
+  useEffect(() => {
+    if (resendSeconds <= 0) return undefined;
+    const timer = window.setTimeout(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendSeconds]);
+  const mutation = useMutation({
+    mutationFn: async ({ persona, careerGoal, ...details }) => {
+      await updateProfile(details);
+      return completeOnboarding({ persona, careerGoal });
+    },
+  });
+  const sendOtp = useMutation({
+    mutationFn: () => sendPhoneOtp(values.phone),
+    onSuccess: (result) => {
+      setDevelopmentCode(result.developmentCode ?? "");
+      setResendSeconds(result.retryAfterSeconds ?? 60);
+      setMessage(`Verification code sent to ${result.destination}.`);
+    },
+  });
+  const verifyOtp = useMutation({
+    mutationFn: () => verifyPhoneOtp(otp),
+    onSuccess: async () => {
+      setOtp(""); setDevelopmentCode(""); setResendSeconds(0); setMessage("Phone number verified. You can now use it to sign in.");
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+
+  const change = ({ target }) => {
+    setValues((current) => ({ ...current, [target.name]: target.value }));
+    setMessage("");
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    const saved = await mutation.mutateAsync({
+      ...values,
+      firstName: values.firstName.trim(),
+      lastName: values.lastName.trim(),
+    });
+    queryClient.setQueryData(["profile"], saved);
+    setValues(editableFields(saved));
+    setMessage("Profile updated successfully.");
+  };
+
+  return (
+    <Card>
+      <section className="profile-photo-editor" aria-labelledby="profile-photo-title"><div className="profile-avatar">{photo.data?<img src={photo.data} alt="Your profile"/>:<span>{(values.firstName[0]||"").toUpperCase()}{(values.lastName[0]||"").toUpperCase()}</span>}</div><div><h2 id="profile-photo-title">Profile photo</h2><p className="muted">JPEG, PNG, or WebP. Maximum 5 MB.</p><div className="profile-photo-actions"><label className="button button--secondary">{photoMutation.isPending?"Uploading…":"Upload photo"}<Input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={photoMutation.isPending} onChange={(event)=>{const file=event.target.files?.[0];if(file)photoMutation.mutate(file);event.target.value="";}}/></label>{profile.photoUrl&&<Button type="button" variant="ghost" disabled={deletePhoto.isPending} onClick={()=>deletePhoto.mutate()}>Remove</Button>}</div></div></section>
+      <dl className="detail-list">
+        <div>
+          <dt>Email</dt>
+          <dd>{profile.email || "Not available"}</dd>
+        </div>
+        <div>
+          <dt>Account role</dt>
+          <dd>{profile.role || "USER"}</dd>
+        </div>
+      </dl>
+
+      <form onSubmit={submit}>
+        <div className="form-grid">
+          <FormField id="firstName" label="First name">
+            <Input
+              id="firstName"
+              name="firstName"
+              value={values.firstName}
+              onChange={change}
+              maxLength={100}
+              autoComplete="given-name"
+              required
+            />
+          </FormField>
+          <FormField id="lastName" label="Last name">
+            <Input
+              id="lastName"
+              name="lastName"
+              value={values.lastName}
+              onChange={change}
+              maxLength={100}
+              autoComplete="family-name"
+              required
+            />
+          </FormField>
+          <FormField id="displayName" label="Display name" hint="Optional name shown in the app.">
+            <Input
+              id="displayName"
+              name="displayName"
+              value={values.displayName}
+              onChange={change}
+              maxLength={100}
+              autoComplete="nickname"
+            />
+          </FormField>
+          <FormField id="phone" label="Phone" hint="Use an Indian mobile number, for example +91 98765 43210.">
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={values.phone}
+              onChange={change}
+              maxLength={50}
+              autoComplete="tel"
+            />
+          </FormField>
+          <FormField id="location" label="Location">
+            <Input
+              id="location"
+              name="location"
+              value={values.location}
+              onChange={change}
+              maxLength={255}
+              autoComplete="address-level2"
+            />
+          </FormField>
+          <FormField id="persona" label="Career stage">
+            <Select id="persona" name="persona" value={values.persona} onChange={change}>
+              <option value="STUDENT">Student</option>
+              <option value="FRESHER">Fresher</option>
+              <option value="PROFESSIONAL">Professional</option>
+              <option value="CAREER_SWITCHER">Career switcher</option>
+            </Select>
+          </FormField>
+          <FormField id="careerGoal" label="Primary goal">
+            <Select id="careerGoal" name="careerGoal" value={values.careerGoal} onChange={change}>
+              <option value="FIRST_RESUME">Create my first resume</option>
+              <option value="IMPROVE_RESUME">Improve my resume</option>
+              <option value="TAILOR_FOR_JOB">Tailor for a specific job</option>
+              <option value="EXPLORE_OPPORTUNITIES">Explore opportunities</option>
+            </Select>
+          </FormField>
+        </div>
+
+        {mutation.error && (
+          <p className="form-error" role="alert">
+            {mutation.error.message}
+          </p>
+        )}
+        {message && <p role="status">{message}</p>}
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Saving…" : "Save profile"}
+        </Button>
+      </form>
+      <section className="phone-verification" aria-labelledby="phone-verification-title">
+        <div><p className="eyebrow">ACCOUNT SECURITY</p><h2 id="phone-verification-title">Phone verification</h2><p className="muted">{profile.phoneVerified ? "Verified — this number can be used to sign in." : "Verify your number before using it to sign in."}</p></div>
+        <span className={`status-pill ${profile.phoneVerified ? "" : "status-pill--warning"}`}>{profile.phoneVerified ? "Verified" : "Not verified"}</span>
+        {!profile.phoneVerified && <div className="phone-verification__form">
+          {!values.phone.trim() && <p className="muted">Enter your mobile number above to enable verification.</p>}
+          <Button type="button" variant="secondary" disabled={!values.phone.trim() || sendOtp.isPending || resendSeconds > 0} onClick={() => sendOtp.mutate()}>{sendOtp.isPending ? "Sending…" : resendSeconds > 0 ? `Resend in ${resendSeconds}s` : sendOtp.isSuccess ? "Resend verification code" : "Send verification code"}</Button>
+          {resendSeconds > 0 && <p className="muted" role="timer" aria-live="polite">You can request another OTP in {resendSeconds} seconds. The current code remains valid for 5 minutes.</p>}
+          {(developmentCode || sendOtp.isSuccess) && <><FormField id="phoneOtp" label="Six-digit verification code"><Input id="phoneOtp" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" /></FormField><Button type="button" disabled={otp.length !== 6 || verifyOtp.isPending} onClick={() => verifyOtp.mutate()}>{verifyOtp.isPending ? "Verifying…" : "Verify phone"}</Button></>}
+          {developmentCode && <p className="notice notice--info" role="status">Development code: <strong>{developmentCode}</strong>. No SMS was sent in fake mode.</p>}
+          {(sendOtp.error || verifyOtp.error) && <p className="form-error" role="alert">{sendOtp.error?.message || verifyOtp.error?.message}</p>}
+        </div>}
+      </section>
+    </Card>
+  );
+};
+
 export const ProfilePanel = () => {
-  const { session } = useAuth();
   const query = useQuery({ queryKey: ["profile"], queryFn: getProfile });
+
   return (
     <ModulePage
       eyebrow="ACCOUNT"
@@ -14,21 +199,7 @@ export const ProfilePanel = () => {
       description="Information shared across your application documents."
     >
       <AsyncState isLoading={query.isLoading} error={query.error?.message} onRetry={query.refetch}>
-        <Card>
-          <dl className="detail-list">
-            <div>
-              <dt>Email</dt>
-              <dd>{session?.email}</dd>
-            </div>
-            <div>
-              <dt>Profile service</dt>
-              <dd>{query.data}</dd>
-            </div>
-          </dl>
-          <p className="muted">
-            Profile editing will activate when the backend returns a structured profile contract.
-          </p>
-        </Card>
+        {query.data ? <ProfileForm key={query.data.id ?? query.data.email} profile={query.data} /> : null}
       </AsyncState>
     </ModulePage>
   );

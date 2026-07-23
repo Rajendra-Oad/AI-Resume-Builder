@@ -1,8 +1,10 @@
 import { useState } from "react";
+
 import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
 import { FormField } from "../../../components/FormField";
 import { ModulePage } from "../../../components/ModulePage";
+import { AiJobSkeleton } from "../../../components/Skeleton";
 import { Textarea } from "../../../components/Textarea";
 import { generateContent } from "../../aiAssistant/api/aiAssistantApi";
 export const CoverLetterWorkspace = () => {
@@ -56,9 +58,7 @@ export const CoverLetterWorkspace = () => {
         </Card>
         <Card>
           <h2>Draft</h2>
-          <p className="cover-output" aria-live="polite">
-            {result || "Your generated draft will appear here."}
-          </p>
+          {state.loading ? <AiJobSkeleton title="Writing your cover letter" steps={["Reviewing your facts", "Shaping your story", "Polishing the draft"]} /> : <p className="cover-output" aria-live="polite">{result || "Your generated draft will appear here."}</p>}
         </Card>
       </div>
     </ModulePage>
