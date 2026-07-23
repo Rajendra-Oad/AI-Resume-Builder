@@ -20,8 +20,12 @@
     <java.version>21</java.version>
     <jacoco.version>0.8.13</jacoco.version>
     <commons-lang3.version>3.20.0</commons-lang3.version>
-    <jackson-bom.version>2.21.3</jackson-bom.version>
+    <jackson-bom.version>2.21.4</jackson-bom.version>
     <log4j2.version>2.25.5</log4j2.version>
+    <netty.version>4.1.136.Final</netty.version>
+    <spring-framework.version>6.2.19</spring-framework.version>
+    <spring-security.version>6.5.11</spring-security.version>
+    <tomcat.version>10.1.57</tomcat.version>
     <backend.coverage.minimum>0.24</backend.coverage.minimum>
   </properties>
 
