@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { AppIcon } from "../components/AppIcon";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
-import { PageLoader } from "../components/PageLoader";
+import { CardSkeleton } from "../components/Skeleton";
 import { listDeletedResumes, restoreResume } from "../features/resume/api/resumeApi";
 
 const remainingDays = (recoverableUntil) => {
@@ -45,7 +45,18 @@ export const RecentlyDeletedPage = () => {
     setMessage(`“${resume.title}” was restored to My Resumes.`);
   };
 
-  if (deleted.isLoading) return <PageLoader />;
+  if (deleted.isLoading)
+    return (
+      <main className="dashboard-page">
+        <header className="page-header">
+          <div>
+            <p className="eyebrow">RECOVERY</p>
+            <h1>Recently deleted</h1>
+          </div>
+        </header>
+        <CardSkeleton count={3} className="deleted-resume-list" />
+      </main>
+    );
   return (
     <main className="dashboard-page">
       <header className="page-header">

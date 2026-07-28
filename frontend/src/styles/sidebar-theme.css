@@ -1,0 +1,88 @@
+.sidebar .brand-mark,
+.sidebar-collapse-button__logo {
+  opacity: 0.82;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sidebar .brand:hover .brand-mark,
+.sidebar .brand:focus-visible .brand-mark,
+.sidebar-collapse-button:hover .sidebar-collapse-button__logo,
+.sidebar-collapse-button:focus-visible .sidebar-collapse-button__logo {
+  opacity: 1;
+}
+
+.sidebar .nav-link {
+  color: hsl(240 10% 16%);
+  font-weight: 600;
+}
+
+.sidebar .nav-link > span {
+  color: inherit;
+  opacity: 1;
+  visibility: visible;
+  -webkit-text-fill-color: currentColor;
+}
+
+.sidebar .nav-link:hover {
+  color: hsl(243 75% 48%);
+  background: hsl(239 84% 67% / 10%);
+}
+
+.sidebar .nav-link.active {
+  color: hsl(240 10% 4%);
+  background: linear-gradient(
+    90deg,
+    hsl(234 89% 82% / 92%) 0%,
+    hsl(234 89% 82% / 54%) 62%,
+    transparent 100%
+  );
+  box-shadow:
+    0 4px 12px hsl(239 84% 67% / 10%),
+    inset 0 1px hsl(0 0% 100% / 42%);
+}
+
+.sidebar .nav-link.active:hover,
+.sidebar .nav-link.active:focus-visible,
+[data-theme="dark"] .sidebar .nav-link.active:hover,
+[data-theme="dark"] .sidebar .nav-link.active:focus-visible {
+  color: hsl(240 10% 4%);
+  background: linear-gradient(
+    90deg,
+    hsl(234 89% 82% / 92%) 0%,
+    hsl(234 89% 82% / 54%) 62%,
+    transparent 100%
+  );
+}
+
+.sidebar .nav-link.active > span,
+.sidebar .nav-link.active .nav-icon {
+  color: hsl(240 10% 4%);
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+[data-theme="dark"] .sidebar .nav-link {
+  color: hsl(240 5% 82%);
+}
+
+[data-theme="dark"] .sidebar .nav-link:hover {
+  color: hsl(234 89% 82%);
+  background: hsl(239 84% 67% / 14%);
+}
+
+[data-theme="dark"] .sidebar .nav-link.active,
+[data-theme="dark"] .sidebar .nav-link.active > span,
+[data-theme="dark"] .sidebar .nav-link.active .nav-icon {
+  color: hsl(240 10% 4%);
+  -webkit-text-fill-color: currentColor;
+}
+
+.app-shell--collapsed .sidebar .nav-link > span {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  .app-shell--collapsed .sidebar .nav-link > span {
+    display: block;
+  }
+}

@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
-import { PageLoader } from "../components/PageLoader";
+import { MotionProvider } from "../components/MotionProvider";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { RouteFocusManager } from "../components/RouteFocusManager";
 import { adminRoutes } from "../features/admin/routes";
@@ -35,8 +35,9 @@ const OnboardingPage = lazy(() =>
   import("../pages/OnboardingPage").then((module) => ({ default: module.OnboardingPage })),
 );
 const RouteRoot = () => (
-  <Suspense fallback={<PageLoader />}>
+  <Suspense fallback={null}>
     <RouteFocusManager />
+    <MotionProvider />
     <Outlet />
   </Suspense>
 );

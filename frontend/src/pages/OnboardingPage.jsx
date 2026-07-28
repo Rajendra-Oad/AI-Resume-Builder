@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
-import { AppIcon } from "../components/AppIcon";
 import { Button } from "../components/Button";
+import { FormSkeleton } from "../components/Skeleton";
 import { completeOnboarding,getProfile } from "../features/profile/api/profileApi";
 
 const personas = [
@@ -55,7 +55,12 @@ export const OnboardingPage = () => {
     if (profile.data?.careerGoal) setCareerGoal(profile.data.careerGoal);
   }, [profile.data]);
 
-  if (profile.isLoading) return <div className="page-loader"><span /></div>;
+  if (profile.isLoading)
+    return (
+      <main className="onboarding-page">
+        <FormSkeleton fields={3} className="onboarding-card" />
+      </main>
+    );
   if (profile.data?.onboardingCompleted) return <Navigate to="/dashboard" replace />;
 
   const finish = async () => {
@@ -70,7 +75,7 @@ export const OnboardingPage = () => {
 
   return (
     <main className="onboarding-page">
-      <header className="onboarding-brand"><span className="brand"><AppIcon name="ai" size={19} /> résumé</span><span>Setup takes about a minute</span></header>
+      <header className="onboarding-brand"><span className="brand"><img className="brand-logo" src="/logo.svg" alt="" /> résumé</span><span>Setup takes about a minute</span></header>
       <section className="onboarding-card" aria-labelledby="onboarding-title">
         <div className="onboarding-progress" aria-label={`Step ${step + 1} of 2`}><span className="eyebrow">STEP {step + 1} OF 2</span><div><i className="complete" /><i className={step === 1 ? "complete" : ""} /></div></div>
         {step === 0 ? <><p className="eyebrow">MAKE IT YOURS</p><h1 id="onboarding-title">Where are you in your career?</h1><p className="muted">We’ll adjust examples and guidance to match your experience. You can change this later.</p><ChoiceList legend="Career stage" name="persona" options={personas} value={persona} onChange={setPersona} /></> : <><p className="eyebrow">YOUR NEXT MOVE</p><h1 id="onboarding-title">What would you like to accomplish first?</h1><p className="muted">Your answer only chooses the best starting point. Every tool remains available.</p><ChoiceList legend="Primary goal" name="careerGoal" options={goals} value={careerGoal} onChange={setCareerGoal} /></>}

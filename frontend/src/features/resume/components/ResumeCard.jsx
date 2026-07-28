@@ -44,10 +44,40 @@ export const ResumeCard = ({ resume }) => {
         <h3>{resume.title}</h3>
         <p>{resume.summary || "No professional summary yet."}</p>
         <div className="resume-card__actions">
-          <Link to={`/resumes/${resume.id}`} className="text-link">Continue editing <span>→</span></Link>
+          <Link to={`/resumes/${resume.id}`} className="resume-card__edit-action">
+            <AppIcon name="coverLetter" size={17} />
+            <span>Continue editing</span>
+            <AppIcon name="expand" size={16} className="resume-card__edit-arrow" />
+          </Link>
           <div className="resume-card__utilities">
-            <Button type="button" variant="ghost" disabled={duplicate.isPending || remove.isPending} onClick={() => { setMessage(""); duplicate.mutate(); }}>{duplicate.isPending ? "Copying…" : "Duplicate"}</Button>
-            <Button type="button" variant="ghost" disabled={duplicate.isPending || remove.isPending} onClick={() => { setMessage(""); setConfirmingDelete(true); }}>Delete</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="resume-card__icon-action"
+              aria-label={duplicate.isPending ? "Duplicating resume" : "Duplicate resume"}
+              title={duplicate.isPending ? "Duplicating resume…" : "Duplicate resume"}
+              disabled={duplicate.isPending || remove.isPending}
+              onClick={() => {
+                setMessage("");
+                duplicate.mutate();
+              }}
+            >
+              <AppIcon name="copy" size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="resume-card__icon-action resume-card__icon-action--danger"
+              aria-label="Delete"
+              title="Delete resume"
+              disabled={duplicate.isPending || remove.isPending}
+              onClick={() => {
+                setMessage("");
+                setConfirmingDelete(true);
+              }}
+            >
+              <AppIcon name="trash" size={16} />
+            </Button>
           </div>
         </div>
         {message && !confirmingDelete && <p className="resume-card__error" role="alert">{message}</p>}
@@ -58,7 +88,10 @@ export const ResumeCard = ({ resume }) => {
         {remove.isError && <p className="form-error" role="alert">{message || "We couldn’t delete this resume. Please try again."}</p>}
         <div className="dialog-actions">
           <Button type="button" variant="secondary" disabled={remove.isPending} onClick={closeDeleteDialog}>Keep resume</Button>
-          <Button type="button" variant="destructive" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? "Deleting…" : "Delete resume"}</Button>
+          <Button type="button" variant="destructive" disabled={remove.isPending} onClick={() => remove.mutate()}>
+            <AppIcon name="trash" size={16} />
+            {remove.isPending ? "Deleting…" : "Delete resume"}
+          </Button>
         </div>
       </Modal>
     </Card>
