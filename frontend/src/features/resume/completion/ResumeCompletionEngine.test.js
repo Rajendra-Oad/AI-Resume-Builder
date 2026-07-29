@@ -14,6 +14,7 @@ describe("ResumeCompletionEngine", () => {
 
   it("scores valid content by configured section weights", () => {
     const resume = {
+      fullName: "Example Person",
       summary: Array.from({ length: 65 }, (_, index) => `specific${index}`).join(" "),
       contactEmail: "person@example.com",
       phone: "+91 98765 43210",
@@ -29,7 +30,7 @@ describe("ResumeCompletionEngine", () => {
       ...["React", "JavaScript", "SQL"].map((name) => ({ type: "SKILL", name })),
       { type: "CERTIFICATION", name: "Cloud", issuedBy: "Provider" },
     ];
-    const result = engine.calculate(resume, sections, { firstName: "Example", lastName: "Person" });
+    const result = engine.calculate(resume, sections, {});
     expect(result.overall).toBeGreaterThan(80);
     expect(result.sections.find((section) => section.id === "personal").status).toBe("complete");
     expect(result.sections.find((section) => section.id === "experience").completion).toBe(100);

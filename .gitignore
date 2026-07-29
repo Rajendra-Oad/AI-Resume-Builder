@@ -17,6 +17,7 @@ Thumbs.db
 node_modules/
 dist/
 coverage/
+test-results/
 .npm/
 
 # Environment files

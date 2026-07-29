@@ -31,7 +31,7 @@ test("a user can sign in and see the dashboard", async ({ page }) => {
   await page.getByRole("button", { name: "Sign in" }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole("heading", { name: "Welcome back, alex." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Good to see you, Alex." })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Your story starts here" })).toBeVisible();
 });
@@ -71,7 +71,7 @@ test("an authenticated user can open their resume list", async ({ page }) => {
   await expect(page).toHaveURL(/\/resumes$/);
   await expect(page.getByRole("heading", { name: "My resumes" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Senior Product Engineer" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /continue editing/i })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Edit Senior Product Engineer" })).toHaveAttribute(
     "href",
     "/resumes/42",
   );
