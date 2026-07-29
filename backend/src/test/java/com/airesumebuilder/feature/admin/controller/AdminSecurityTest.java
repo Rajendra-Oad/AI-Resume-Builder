@@ -28,7 +28,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(
+    controllers = AdminController.class,
+    properties = {
+        "DB_URL=jdbc:mysql://localhost:3306/test",
+        "DB_PASSWORD=test-database-password",
+        "JWT_SECRET=01234567890123456789012345678901"
+    }
+)
 @Import({SecurityConfig.class, RestAuthenticationEntryPoint.class, RestAccessDeniedHandler.class})
 class AdminSecurityTest {
     @Autowired
