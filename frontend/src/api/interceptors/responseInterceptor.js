@@ -1,10 +1,16 @@
+import { notify } from "../../components/NotificationProvider";
+import { authSession } from "../../services/authSession";
 import { normalizeApiError } from "../errorHandler";
 import { expireSession, refreshAccessToken } from "../tokenRefresh";
 
+const isPublicAuthRequest = (url = "") =>
+  /\/auth\/(login|register|refresh|forgot-password|reset-password|verify-email|resend-verification)(?:[/?]|$)/.test(url);
+
 const shouldRefresh = (error) =>
   error.response?.status === 401 &&
+  Boolean(authSession.getToken()) &&
   !error.config?._retried &&
-  !error.config?.url?.includes("/auth/refresh");
+  !isPublicAuthRequest(error.config?.url);
 
 export const installResponseInterceptor = (client) =>
   client.interceptors.response.use(
@@ -21,6 +27,20 @@ export const installResponseInterceptor = (client) =>
           expireSession();
         }
       }
-      return Promise.reject(normalizeApiError(error));
+      const normalized = normalizeApiError(error);
+      if (normalized.status === 429) {
+        notify.warning({
+          title: "Too many requests",
+          message: normalized.message || "Please wait a moment before trying again.",
+        });
+      } else if (normalized.status >= 500) {
+        notify.error({
+          title: "Service unavailable",
+          message: normalized.message,
+          details: normalized.requestId ? `Request ID: ${normalized.requestId}` : normalized.message,
+          copyError: true,
+        });
+      }
+      return Promise.reject(normalized);
     },
   );

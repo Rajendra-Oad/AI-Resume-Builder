@@ -77,6 +77,7 @@ class CrossModuleWorkflowTest {
         state.put("title", title);
         state.put("summary", summary);
         state.put("targetJobTitle", null);
+        state.put("fullName", null);
         state.put("status", "DRAFT");
         return state;
     }

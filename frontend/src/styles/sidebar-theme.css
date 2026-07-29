@@ -24,20 +24,20 @@
 }
 
 .sidebar .nav-link:hover {
-  color: hsl(243 75% 48%);
-  background: hsl(239 84% 67% / 10%);
+  color: var(--color-brand-strong);
+  background: var(--color-brand-wash);
 }
 
 .sidebar .nav-link.active {
   color: hsl(240 10% 4%);
   background: linear-gradient(
     90deg,
-    hsl(234 89% 82% / 92%) 0%,
-    hsl(234 89% 82% / 54%) 62%,
+    color-mix(in srgb, var(--color-brand-soft) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand-soft) 54%, transparent) 62%,
     transparent 100%
   );
   box-shadow:
-    0 4px 12px hsl(239 84% 67% / 10%),
+    0 4px 12px var(--color-brand-wash),
     inset 0 1px hsl(0 0% 100% / 42%);
 }
 
@@ -48,8 +48,8 @@
   color: hsl(240 10% 4%);
   background: linear-gradient(
     90deg,
-    hsl(234 89% 82% / 92%) 0%,
-    hsl(234 89% 82% / 54%) 62%,
+    color-mix(in srgb, var(--color-brand-soft) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand-soft) 54%, transparent) 62%,
     transparent 100%
   );
 }
@@ -66,14 +66,14 @@
 }
 
 [data-theme="dark"] .sidebar .nav-link:hover {
-  color: hsl(234 89% 82%);
-  background: hsl(239 84% 67% / 14%);
+  color: var(--color-brand-strong);
+  background: var(--color-brand-wash);
 }
 
 [data-theme="dark"] .sidebar .nav-link.active,
 [data-theme="dark"] .sidebar .nav-link.active > span,
 [data-theme="dark"] .sidebar .nav-link.active .nav-icon {
-  color: hsl(240 10% 4%);
+  color: var(--color-ink-strong);
   -webkit-text-fill-color: currentColor;
 }
 

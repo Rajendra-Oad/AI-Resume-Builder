@@ -1,9 +1,80 @@
-import { useMutation,useQuery,useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import { AsyncState } from "../../../components/AsyncState";
 import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
 import { ModulePage } from "../../../components/ModulePage";
-import { listVersions,rollbackVersion } from "../api/resumeApi";
-export const ResumeVersionsPanel=({resumeId})=>{const client=useQueryClient();const versions=useQuery({queryKey:["resume-versions",resumeId],queryFn:()=>listVersions(resumeId)});const rollback=useMutation({mutationFn:(versionId)=>rollbackVersion({resumeId,versionId}),onSuccess:async()=>{await client.invalidateQueries({queryKey:["resume",resumeId]});await client.invalidateQueries({queryKey:["resume-versions",resumeId]});}});return <ModulePage eyebrow="VERSION HISTORY" title="Resume versions" description="Review immutable snapshots and restore an earlier version without deleting newer history."><div className="section-header"><Link className="text-link" to={`/resumes/${resumeId}/edit`}>← Back to editor</Link></div><AsyncState isLoading={versions.isLoading} error={versions.error?.message} onRetry={versions.refetch}><div className="version-list">{(versions.data?.items??[]).map((item,index)=><Card key={item.id} className="version-card"><div><span className="status-pill">Version {item.versionNumber}</span><h2>{item.label||"Saved version"}</h2><p className="muted">{item.source.replaceAll("_"," ")} · {new Date(item.createdAt).toLocaleString()}</p></div><div className="form-actions"><Link to={`/resumes/${resumeId}/versions/${item.id}`}><Button variant="ghost">Inspect</Button></Link>{index>0&&<Button variant="secondary" disabled={rollback.isPending} onClick={()=>rollback.mutate(item.id)}>Restore</Button>}</div></Card>)}{!versions.data?.items?.length&&<Card className="empty-state"><h2>No versions yet</h2></Card>}</div></AsyncState>{rollback.isSuccess&&<p className="form-success" role="status">Version restored as a new snapshot.</p>}</ModulePage>;};
+import { ListSkeleton } from "../../../components/Skeleton";
+import { listVersions, rollbackVersion } from "../api/resumeApi";
+export const ResumeVersionsPanel = ({ resumeId }) => {
+  const client = useQueryClient();
+  const versions = useQuery({
+    queryKey: ["resume-versions", resumeId],
+    queryFn: () => listVersions(resumeId),
+  });
+  const rollback = useMutation({
+    mutationFn: (versionId) => rollbackVersion({ resumeId, versionId }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ["resume", resumeId] });
+      await client.invalidateQueries({ queryKey: ["resume-versions", resumeId] });
+    },
+  });
+  return (
+    <ModulePage
+      eyebrow="VERSION HISTORY"
+      title="Resume versions"
+      description="Review immutable snapshots and restore an earlier version without deleting newer history."
+    >
+      <div className="section-header">
+        <Link className="text-link" to={`/resumes/${resumeId}/edit`}>
+          ← Back to editor
+        </Link>
+      </div>
+      <AsyncState
+        isLoading={versions.isLoading}
+        error={versions.error?.message}
+        onRetry={versions.refetch}
+        fallback={<ListSkeleton count={4} className="version-list" />}
+      >
+        <div className="version-list">
+          {(versions.data?.items ?? []).map((item, index) => (
+            <Card key={item.id} className="version-card">
+              <div>
+                <span className="status-pill">Version {item.versionNumber}</span>
+                <h2>{item.label || "Saved version"}</h2>
+                <p className="muted">
+                  {item.source.replaceAll("_", " ")} · {new Date(item.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div className="form-actions">
+                <Link to={`/resumes/${resumeId}/versions/${item.id}`}>
+                  <Button variant="ghost">Inspect</Button>
+                </Link>
+                {index > 0 && (
+                  <Button
+                    variant="secondary"
+                    disabled={rollback.isPending}
+                    onClick={() => rollback.mutate(item.id)}
+                  >
+                    Restore
+                  </Button>
+                )}
+              </div>
+            </Card>
+          ))}
+          {!versions.data?.items?.length && (
+            <Card className="empty-state">
+              <h2>No versions yet</h2>
+            </Card>
+          )}
+        </div>
+      </AsyncState>
+      {rollback.isSuccess && (
+        <p className="form-success" role="status">
+          Version restored as a new snapshot.
+        </p>
+      )}
+    </ModulePage>
+  );
+};

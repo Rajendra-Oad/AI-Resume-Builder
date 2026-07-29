@@ -22,4 +22,7 @@ public class Template {
 
     @PrePersist void create() { if (createdAt == null) createdAt = Instant.now(); }
     @PreUpdate void update() { updatedAt = Instant.now(); }
+
+    public Long getId() { return id; }
+    public String getConfiguration() { return configuration; }
 }

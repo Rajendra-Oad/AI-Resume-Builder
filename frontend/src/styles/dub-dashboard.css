@@ -1,0 +1,710 @@
+.app-shell {
+  --color-canvas: #fff; --color-canvas-subtle: #f7f7f7; --color-surface: #fff;
+  --color-surface-muted: #f5f5f5; --color-ink: #171717; --color-ink-strong: #0a0a0a;
+  --color-ink-subtle: #737373; --color-ink-muted: #525252; --color-ink-soft: #404040;
+  --color-brand: #2563eb; --color-brand-strong: #2563eb; --color-brand-hover: #f5f5f5;
+  --color-brand-soft: #dbeafe; --color-brand-muted: #bfdbfe; --color-brand-text: #262626;
+  --color-brand-text-muted: #737373; --color-brand-border: #e5e5e5;
+  --color-brand-progress: #2563eb; --color-brand-surface: #f5f5f5;
+  --color-brand-surface-subtle: #ffffff; --color-border-tinted: #d4d4d4;
+  --color-accent: #2563eb; --color-accent-strong: #1e40af;
+  --color-accent-bright: #2563eb; --color-accent-warm: #2563eb;
+  --color-border: #e5e5e5; --color-border-soft: #e5e5e5; --color-border-strong: #d4d4d4;
+  --color-focus-ring: rgb(37 99 235 / 18%); --color-brand-wash: #dbeafe;
+  --paper: #fff; --cream: #f7f7f7; --mint: #dbeafe; --forest: #2563eb;
+  --muted: #737373; --surface-raised: rgb(255 255 255 / 92%);
+  --sidebar-bg: #fff; --shadow-card: none; --shadow-premium: none;
+  font-family: var(--font-inter); background: var(--color-paper-mist);
+}
+.sidebar { width:238px; padding:24px 14px 18px; color:#171717; background:#fff; border-right:1px solid #e5e5e5; }
+.workspace { width:calc(100% - 238px); margin-left:238px; }
+.sidebar-header { margin:0 8px 36px; min-height:36px; }
+.sidebar .brand { color:#0a0a0a; font-weight:600; letter-spacing:-.02em; }
+.brand-mark { width:28px; height:28px; }
+.sidebar-label { margin:0 10px 8px; color:#a3a3a3; font-size:10px; font-weight:600; letter-spacing:.1em; }
+.sidebar nav { gap:3px; }
+.sidebar .nav-link { min-height:40px; padding:9px 11px; gap:11px; border-radius:8px; color:#525252; font-size:13px; font-weight:500; }
+.sidebar .nav-link:hover { color:#171717; background:#f5f5f5; }
+.sidebar .nav-link.active,.sidebar .nav-link.active:hover,.sidebar .nav-link.active:focus-visible { color:#1e40af; background:#dbeafe; box-shadow:none; }
+.sidebar .nav-link.active > span,.sidebar .nav-link.active .nav-icon { color:#1e40af; }
+.sidebar-control { color:#737373; background:transparent; border:1px solid #e5e5e5; }
+.sidebar-control:hover { color:#171717; background:#f5f5f5; }
+.account { color:#171717; border-color:#e5e5e5; }
+.account small,.account-logout { color:#737373; }
+.avatar { color:#1e40af; background:#dbeafe; box-shadow:none; }
+.workspace-bar { min-height:64px; padding:10px clamp(24px,4vw,48px); background:rgb(255 255 255 / 88%); border-color:#e5e5e5; backdrop-filter:blur(16px); }
+.global-search { width:min(340px,42vw); min-height:38px; border-color:#e5e5e5; border-radius:8px; color:#737373; background:#fff; box-shadow:none; font-size:13px; }
+.global-search kbd { color:#737373; background:#f5f5f5; border:1px solid #e5e5e5; border-radius:5px; }
+.topbar-action,.topbar-profile { color:#525252; background:#fff; border-color:#e5e5e5; border-radius:8px; box-shadow:none; }
+.dashboard-page { max-width:1200px; padding:44px 48px 72px; }
+.dashboard-heading { margin-bottom:28px; align-items:center; }
+.dashboard-heading h1 { margin:6px 0 7px; color:var(--color-charcoal); font-family:var(--font-satoshi); font-size:clamp(var(--text-heading),4vw,40px); font-weight:var(--font-weight-medium); letter-spacing:-.035em; line-height:1.08; }
+.eyebrow { color:#737373; font-size:10px; font-weight:600; letter-spacing:.1em; }
+.muted { color:#737373; }
+.button,.new-resume-button { min-height:38px; padding-inline:15px; border-radius:8px; font-size:13px; font-weight:500; box-shadow:none; }
+.new-resume-button { color:#fff; background:#0a0a0a; border-color:#0a0a0a; }
+.new-resume-button:hover { color:#fff; background:#262626; border-color:#262626; }
+.dashboard-page .card { color:#171717; background:#fff; border:1px solid #e5e5e5; border-radius:12px; box-shadow:none; }
+.dashboard-metrics { gap:12px; }
+.metric-card { padding:16px; transition:border-color .16s ease,background .16s ease; }
+.metric-card:hover { transform:none; border-color:#d4d4d4; background:#fafafa; box-shadow:none; }
+.metric-card__top { margin-bottom:18px; }
+.metric-card__icon,.action-icon { width:34px; height:34px; color:#2563eb; background:#eff6ff; border-radius:8px; }
+.dashboard-metrics .metric-card__icon,
+.dashboard-metrics .metric-card--green .metric-card__icon,
+.dashboard-metrics .metric-card--violet .metric-card__icon,
+.dashboard-metrics .metric-card--amber .metric-card__icon {
+  color: var(--color-electric-blue);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+.metric-card__trend { color:#a3a3a3; font-size:10px; }
+.metric-card > strong { font-size:26px; font-weight:500; letter-spacing:-.03em; }
+.metric-card > span { font-size:13px; font-weight:500; }
+.metric-card > small { color:#737373; font-size:11px; }
+.dashboard-feature-grid { gap:12px; margin-top:12px; grid-template-columns:minmax(0,2fr) minmax(230px,.72fr); }
+.next-step-card { min-height:286px; padding:28px; border-color:#e5e5e5; color:#171717; background-color:#fff; background-image:radial-gradient(#d4d4d4 .7px,transparent .7px); background-size:15px 15px; box-shadow:none; }
+.feature-badge { color:#7c3aed; background:#f3e8ff; border:0; padding:6px 10px; font-size:10px; font-weight:600; letter-spacing:.05em; }
+.next-step-card h2 { margin:16px 0 10px; font-family:var(--font-inter); font-size:clamp(var(--text-heading-sm),3vw,34px); font-weight:var(--font-weight-medium); letter-spacing:-.035em; }
+.next-step-card__copy > p { color:#525252; line-height:1.55; }
+.quiet-link,.text-link { color:#2563eb; }
+.next-step-actions .button { color:#fff; background:#0a0a0a; border-color:#0a0a0a; }
+.insight-visual { border-color:#e5e5e5; border-radius:12px; background:rgb(255 255 255 / 94%); box-shadow:0 0 0 4px rgb(0 0 0 / 5%); }
+.insight-orbit { color:#fff; background:#2563eb; box-shadow:0 0 0 8px #dbeafe; }
+.insight-line { color:#737373; border-color:#e5e5e5; }
+.insight-line strong { color:#171717; }
+.insight-meter { background:#e5e5e5; }
+.insight-meter i { background:#2563eb; }
+.progress-ring { background:conic-gradient(#2563eb var(--progress),#e5e5e5 0); }
+.progress-ring::before { background:#fff; }
+.card-title-row > strong { color:#2563eb; }
+.section-header { margin:42px 0 16px; }
+.section-header h2 { color:#171717; font-size:22px; font-weight:500; letter-spacing:-.025em; }
+.quick-action-grid { gap:12px; }
+.quick-action-grid .card { min-height:104px; padding:16px; }
+.quick-action-grid a:hover .card { transform:none; border-color:#c8c8c8; background:#fafafa; box-shadow:none; }
+.quick-action-grid h3 { font-size:14px; font-weight:500; }
+.quick-action-grid p { color:#737373; font-size:12px; }
+@media (max-width:1000px) {
+  .dashboard-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .dashboard-feature-grid { grid-template-columns:1fr; }
+}
+@media (max-width:800px) {
+  .mobile-app-bar { color:#171717; background:#fff; border-bottom:1px solid #e5e5e5; }
+  .mobile-app-bar .brand { color:#171717; }
+  .sidebar { width:min(86vw,300px); }
+  .workspace { width:100%; margin:0; }
+  .dashboard-page { padding:30px 20px 56px; }
+}
+@media (max-width:560px) {
+  .dashboard-heading { align-items:flex-start; flex-direction:column; }
+  .dashboard-metrics { grid-template-columns:1fr; }
+  .next-step-card { grid-template-columns:1fr; }
+  .insight-visual { display:none; }
+}
+
+/* Authenticated workspace controls: eliminate legacy green/purple treatments. */
+.app-shell .button,
+.app-shell button.button,
+.app-shell .new-resume-button,
+.app-shell button[type="submit"] {
+  min-height: 38px;
+  border: 1px solid var(--color-primary-action-fill);
+  border-radius: var(--radius-buttons);
+  color: var(--color-canvas-white);
+  background: var(--color-primary-action-fill);
+  box-shadow: var(--shadow-subtle);
+  font-family: var(--font-inter);
+  font-weight: var(--font-weight-medium);
+}
+
+.app-shell .button:hover:not(:disabled),
+.app-shell button.button:hover:not(:disabled),
+.app-shell .new-resume-button:hover:not(:disabled),
+.app-shell button[type="submit"]:hover:not(:disabled) {
+  border-color: var(--color-graphite);
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+  box-shadow: var(--shadow-subtle);
+}
+
+.app-shell .button--secondary,
+.app-shell .button--ghost,
+.app-shell button.bg-brand-soft,
+.app-shell button.bg-transparent {
+  border-color: var(--color-ash);
+  color: var(--color-charcoal);
+  background: var(--color-canvas-white);
+  box-shadow: none;
+}
+
+.app-shell .button--secondary:hover:not(:disabled),
+.app-shell .button--ghost:hover:not(:disabled),
+.app-shell button.bg-brand-soft:hover:not(:disabled),
+.app-shell button.bg-transparent:hover:not(:disabled) {
+  border-color: var(--color-smoke);
+  color: var(--color-midnight-ink);
+  background: var(--color-paper-mist);
+}
+
+.app-shell .button--destructive {
+  border-color: var(--color-danger);
+  color: var(--color-canvas-white);
+  background: var(--color-danger);
+}
+
+.app-shell input,
+.app-shell textarea,
+.app-shell select {
+  border-color: var(--color-ash);
+  border-radius: var(--radius-inputs);
+  color: var(--color-charcoal);
+  background: var(--color-canvas-white);
+}
+
+.app-shell input:focus,
+.app-shell textarea:focus,
+.app-shell select:focus {
+  border-color: var(--color-electric-blue);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.app-shell a.text-link,
+.app-shell .quiet-link {
+  color: var(--color-electric-blue);
+}
+
+.app-shell .score-track i,
+.app-shell .completion-linear i,
+.app-shell .insight-meter i {
+  background: var(--color-electric-blue);
+}
+
+.app-shell .completion-ring,
+.app-shell .progress-ring,
+.app-shell .ats-score-ring {
+  --forest: var(--color-electric-blue);
+}
+
+[data-theme="dark"] .app-shell {
+  --color-canvas: #0a0a0a;
+  --color-canvas-subtle: #0a0a0a;
+  --color-surface: #171717;
+  --color-surface-muted: #262626;
+  --color-ink: #f5f5f5;
+  --color-ink-strong: #ffffff;
+  --color-ink-subtle: #a3a3a3;
+  --color-ink-muted: #d4d4d4;
+  --color-ink-soft: #e5e5e5;
+  --color-brand: #60a5fa;
+  --color-brand-strong: #60a5fa;
+  --color-brand-hover: #262626;
+  --color-brand-soft: #172554;
+  --color-brand-muted: #1e40af;
+  --color-brand-text: #dbeafe;
+  --color-brand-text-muted: #a3a3a3;
+  --color-brand-border: #404040;
+  --color-brand-border-hover: #60a5fa;
+  --color-brand-disabled: #525252;
+  --color-brand-progress: #60a5fa;
+  --color-brand-surface: #262626;
+  --color-brand-surface-subtle: #171717;
+  --color-border-tinted: #404040;
+  --color-accent: #60a5fa;
+  --color-accent-strong: #bfdbfe;
+  --color-accent-bright: #60a5fa;
+  --color-accent-warm: #60a5fa;
+  --color-border: #262626;
+  --color-border-soft: #262626;
+  --color-border-strong: #404040;
+  --color-focus-ring: rgb(96 165 250 / 25%);
+  --paper: #171717;
+  --cream: #0a0a0a;
+  --mint: #172554;
+  --forest: #60a5fa;
+  --muted: #a3a3a3;
+  --surface-raised: rgb(10 10 10 / 90%);
+  --surface-solid: #171717;
+  --sidebar-bg: #0a0a0a;
+  color-scheme: dark;
+  color: var(--color-paper-mist);
+  background: var(--color-midnight-ink);
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] #root,
+[data-theme="dark"] .app-shell,
+[data-theme="dark"] .app-shell .workspace,
+[data-theme="dark"] .app-shell .dashboard-page,
+[data-theme="dark"] .app-shell .editor-page {
+  background-color: var(--color-midnight-ink);
+  background-image: none;
+}
+
+[data-theme="dark"] .app-shell .sidebar,
+[data-theme="dark"] .app-shell .mobile-app-bar {
+  color: var(--color-paper-mist);
+  background: var(--color-midnight-ink);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .sidebar .brand,
+[data-theme="dark"] .app-shell .mobile-app-bar .brand,
+[data-theme="dark"] .app-shell .account {
+  color: var(--color-paper-mist);
+}
+
+[data-theme="dark"] .app-shell .sidebar .nav-link {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .sidebar .nav-link:hover {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+}
+
+[data-theme="dark"] .app-shell .sidebar .nav-link.active,
+[data-theme="dark"] .app-shell .sidebar .nav-link.active:hover,
+[data-theme="dark"] .app-shell .sidebar .nav-link.active > span,
+[data-theme="dark"] .app-shell .sidebar .nav-link.active .nav-icon {
+  color: #bfdbfe;
+  background: #172554;
+}
+
+[data-theme="dark"] .app-shell .workspace-bar {
+  background: rgb(10 10 10 / 88%);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .global-search,
+[data-theme="dark"] .app-shell .topbar-action,
+[data-theme="dark"] .app-shell .topbar-profile,
+[data-theme="dark"] .app-shell .card,
+[data-theme="dark"] .app-shell input,
+[data-theme="dark"] .app-shell textarea,
+[data-theme="dark"] .app-shell select {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .button,
+[data-theme="dark"] .app-shell button.button,
+[data-theme="dark"] .app-shell .new-resume-button,
+[data-theme="dark"] .app-shell button[type="submit"] {
+  border-color: var(--color-canvas-white);
+  color: var(--color-midnight-ink);
+  background: var(--color-canvas-white);
+}
+
+[data-theme="dark"] .app-shell .button:hover:not(:disabled),
+[data-theme="dark"] .app-shell button.button:hover:not(:disabled),
+[data-theme="dark"] .app-shell .new-resume-button:hover:not(:disabled),
+[data-theme="dark"] .app-shell button[type="submit"]:hover:not(:disabled) {
+  border-color: var(--color-smoke);
+  color: var(--color-midnight-ink);
+  background: var(--color-smoke);
+}
+
+[data-theme="dark"] .app-shell .button--secondary,
+[data-theme="dark"] .app-shell .button--ghost,
+[data-theme="dark"] .app-shell button.bg-brand-soft,
+[data-theme="dark"] .app-shell button.bg-transparent {
+  border-color: var(--color-slate);
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+}
+
+[data-theme="dark"] .app-shell .button--secondary:hover:not(:disabled),
+[data-theme="dark"] .app-shell .button--ghost:hover:not(:disabled),
+[data-theme="dark"] .app-shell button.bg-brand-soft:hover:not(:disabled),
+[data-theme="dark"] .app-shell button.bg-transparent:hover:not(:disabled) {
+  border-color: var(--color-steel);
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .button--destructive,
+[data-theme="dark"] .app-shell .button--destructive:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  color: var(--color-canvas-white);
+  background: var(--color-danger);
+}
+
+[data-theme="dark"] .app-shell .next-step-card {
+  color: var(--color-paper-mist);
+  background-color: var(--color-charcoal);
+  background-image: radial-gradient(var(--color-slate) .7px, transparent .7px);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .next-step-card__copy > p,
+[data-theme="dark"] .app-shell .metric-card > small,
+[data-theme="dark"] .app-shell .quick-action-grid p {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .progress-ring::before {
+  background: var(--color-charcoal);
+}
+
+[data-theme="dark"] .app-shell .dashboard-heading h1,
+[data-theme="dark"] .app-shell .section-header h2,
+[data-theme="dark"] .app-shell .card h2,
+[data-theme="dark"] .app-shell .card h3,
+[data-theme="dark"] .app-shell .metric-card,
+[data-theme="dark"] .app-shell .metric-card > span,
+[data-theme="dark"] .app-shell .metric-card > strong,
+[data-theme="dark"] .app-shell .card-title-row h2,
+[data-theme="dark"] .app-shell .progress-ring span {
+  color: var(--color-paper-mist);
+}
+
+[data-theme="dark"] .app-shell .metric-card:hover,
+[data-theme="dark"] .app-shell .quick-action-grid a:hover .card {
+  color: var(--color-paper-mist);
+  background: var(--color-graphite);
+  border-color: var(--color-slate);
+}
+
+/* Overview: one consistent blue accent across every metric in dark mode. */
+[data-theme="dark"] .app-shell .dashboard-heading {
+  color: var(--color-paper-mist);
+}
+
+[data-theme="dark"] .app-shell .dashboard-heading .eyebrow {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .dashboard-heading .muted {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card__icon,
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card--green .metric-card__icon,
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card--violet .metric-card__icon,
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card--amber .metric-card__icon {
+  color: #bfdbfe;
+  background: #172554;
+  border: 1px solid #1e40af;
+}
+
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card__trend,
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card > small {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card > strong,
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card > span {
+  color: var(--color-paper-mist);
+}
+
+[data-theme="dark"] .app-shell .dashboard-metrics .metric-card:hover {
+  background: var(--color-graphite);
+  border-color: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .dashboard-heading .new-resume-button {
+  color: var(--color-midnight-ink);
+  background: var(--color-canvas-white);
+  border-color: var(--color-canvas-white);
+}
+
+[data-theme="dark"] .app-shell .dashboard-heading .new-resume-button:hover:not(:disabled) {
+  color: var(--color-midnight-ink);
+  background: var(--color-smoke);
+  border-color: var(--color-smoke);
+}
+
+[data-theme="dark"] .app-shell .insight-visual {
+  color: var(--color-paper-mist);
+  background: var(--color-graphite);
+  border-color: var(--color-slate);
+  box-shadow: var(--shadow-subtle-2);
+}
+
+[data-theme="dark"] .app-shell .insight-line,
+[data-theme="dark"] .app-shell .insight-line strong {
+  color: var(--color-paper-mist);
+  border-color: var(--color-slate);
+}
+
+/* Buttons that intentionally do not use the shared Button component. */
+[data-theme="dark"] .app-shell .resume-card__icon-action,
+[data-theme="dark"] .app-shell .icon-button,
+[data-theme="dark"] .app-shell .confirmation-dialog__close,
+[data-theme="dark"] .app-shell .command-results button,
+[data-theme="dark"] .app-shell .dropdown-menu button,
+[data-theme="dark"] .app-shell .ats-history button,
+[data-theme="dark"] .app-shell .completion-section {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+  border-color: var(--color-slate);
+  box-shadow: none;
+}
+
+[data-theme="dark"] .app-shell .resume-card__icon-action:hover:not(:disabled),
+[data-theme="dark"] .app-shell .icon-button:hover:not(:disabled),
+[data-theme="dark"] .app-shell .confirmation-dialog__close:hover:not(:disabled),
+[data-theme="dark"] .app-shell .command-results button:hover,
+[data-theme="dark"] .app-shell .dropdown-menu button:hover,
+[data-theme="dark"] .app-shell .ats-history button:hover,
+[data-theme="dark"] .app-shell .completion-section:hover {
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+  border-color: var(--color-electric-blue);
+}
+
+[data-theme="dark"] .app-shell .resume-card__icon-action--danger,
+[data-theme="dark"] .app-shell .resume-card__icon-action--danger:hover:not(:disabled) {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--color-charcoal));
+  border-color: color-mix(in srgb, var(--color-danger) 40%, var(--color-slate));
+}
+
+[data-theme="dark"] .app-shell .resume-card {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .document-thumbnail {
+  color: var(--color-electric-blue);
+  background: var(--color-midnight-ink);
+  border-right: 1px solid var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .document-thumbnail__icon {
+  color: var(--color-electric-blue);
+  background: var(--color-charcoal);
+  border-color: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .document-thumbnail i {
+  background: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .resume-card .eyebrow {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .resume-card h3 {
+  color: var(--color-paper-mist);
+}
+
+[data-theme="dark"] .app-shell .resume-card p:not(.eyebrow) {
+  color: var(--color-silver);
+}
+
+[data-theme="dark"] .app-shell .resume-card__actions {
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .resume-card__edit-action {
+  color: var(--color-silver);
+  background: var(--color-charcoal);
+  border-color: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .resume-card__edit-action:hover {
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+  border-color: var(--color-electric-blue);
+}
+
+[data-theme="dark"] .app-shell .sidebar-control,
+[data-theme="dark"] .app-shell .topbar-action {
+  color: var(--color-silver);
+  background: var(--color-charcoal);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .sidebar-control:hover,
+[data-theme="dark"] .app-shell .topbar-action:hover {
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+  border-color: var(--color-slate);
+}
+
+/* Template library uses the dashboard palette, not template document metadata. */
+.app-shell .template-toolbar,
+.app-shell .template-card {
+  color: var(--color-charcoal);
+  background: var(--color-canvas-white);
+  border-color: var(--color-ash);
+}
+
+.app-shell .template-preview {
+  min-height: 180px;
+  margin-bottom: var(--spacing-20);
+  padding: var(--spacing-24);
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-cards);
+  color: var(--color-graphite);
+  background: var(--color-paper-mist);
+  box-shadow: none;
+}
+
+.app-shell .template-preview--modern {
+  border-top: 8px solid var(--color-electric-blue);
+}
+
+.app-shell .template-preview i {
+  height: 6px;
+  margin: var(--spacing-12) 0;
+  border-radius: var(--radius-full);
+  background: var(--color-smoke);
+}
+
+.app-shell .template-preview i:first-child {
+  width: 48%;
+  background: var(--color-electric-blue);
+}
+
+.app-shell .document-thumbnail {
+  align-items: stretch;
+  padding: var(--spacing-20) var(--spacing-16);
+  color: var(--color-electric-blue);
+  background: var(--color-paper-mist);
+  border-right: 1px solid var(--color-ash);
+}
+
+.app-shell .document-thumbnail__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--spacing-8);
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-xl);
+  color: var(--color-electric-blue);
+  background: var(--color-canvas-white);
+}
+
+.app-shell .document-thumbnail i {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-smoke);
+}
+
+.app-shell .document-thumbnail i:first-of-type {
+  width: 88%;
+  background: var(--color-electric-blue);
+}
+
+.app-shell .resume-card__icon-action,
+.app-shell .resume-card__edit-action {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: var(--radius-buttons);
+}
+
+.app-shell .resume-card__actions .resume-card__icon-action:not(.resume-card__icon-action--danger) {
+  color: var(--color-midnight-ink);
+  background: var(--color-canvas-white);
+  border-color: var(--color-ash);
+}
+
+.app-shell .resume-card__actions .resume-card__icon-action:not(.resume-card__icon-action--danger):hover:not(:disabled) {
+  color: var(--color-midnight-ink);
+  background: var(--color-paper-mist);
+  border-color: var(--color-smoke);
+}
+
+.app-shell button.resume-card__delete-action.resume-card__icon-action--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border-color: color-mix(in srgb, var(--color-danger) 28%, var(--color-ash));
+}
+
+.app-shell button.resume-card__delete-action.resume-card__icon-action--danger:hover:not(:disabled) {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, var(--color-canvas-white));
+  border-color: var(--color-danger);
+}
+
+[data-theme="dark"] .app-shell .resume-card__actions .resume-card__icon-action:not(.resume-card__icon-action--danger) {
+  color: var(--color-canvas-white);
+  background: var(--color-charcoal);
+  border-color: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .resume-card__actions .resume-card__icon-action:not(.resume-card__icon-action--danger):hover:not(:disabled) {
+  color: var(--color-canvas-white);
+  background: var(--color-graphite);
+  border-color: var(--color-steel);
+}
+
+[data-theme="dark"] .app-shell button.resume-card__delete-action.resume-card__icon-action--danger {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 14%, var(--color-charcoal));
+  border-color: color-mix(in srgb, var(--color-danger) 38%, var(--color-slate));
+}
+
+[data-theme="dark"] .app-shell button.resume-card__delete-action.resume-card__icon-action--danger:hover:not(:disabled) {
+  color: var(--color-danger);
+  background: var(--color-graphite);
+  border-color: var(--color-danger);
+}
+
+.app-shell .resume-card__delete-action {
+  position: static;
+  inset: auto;
+}
+
+.app-shell .resume-card__actions {
+  align-items: center;
+}
+
+.app-shell .resume-card__utilities {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-8);
+}
+
+.app-shell .resume-card__utilities > .button,
+.app-shell .resume-card__utilities > .resume-card__edit-action {
+  flex: 0 0 40px;
+  margin: 0;
+}
+
+.app-shell button.resume-card__delete-action.resume-card__icon-action--danger svg {
+  color: var(--color-danger);
+  stroke: currentColor;
+}
+
+[data-theme="dark"] .app-shell .template-toolbar,
+[data-theme="dark"] .app-shell .template-card {
+  color: var(--color-paper-mist);
+  background: var(--color-charcoal);
+  border-color: var(--color-graphite);
+}
+
+[data-theme="dark"] .app-shell .template-preview {
+  color: var(--color-silver);
+  background: var(--color-midnight-ink);
+  border-color: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .template-preview--modern {
+  border-top-color: var(--color-electric-blue);
+}
+
+[data-theme="dark"] .app-shell .template-preview i {
+  background: var(--color-slate);
+}
+
+[data-theme="dark"] .app-shell .template-preview i:first-child {
+  background: var(--color-electric-blue);
+}

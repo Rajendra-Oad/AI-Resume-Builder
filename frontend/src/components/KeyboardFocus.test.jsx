@@ -43,5 +43,6 @@ describe("keyboard and focus behavior", () => {
     render(<MemoryRouter initialEntries={["/"]}><RouteFocusManager /><Routes><Route path="/" element={<First />} /><Route path="/second" element={<main><h1>Second</h1></main>} /></Routes></MemoryRouter>);
     await user.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByRole("heading", { name: "Second" })).toHaveFocus();
+    expect(screen.getByRole("heading", { name: "Second" })).toHaveClass("route-focus-heading");
   });
 });

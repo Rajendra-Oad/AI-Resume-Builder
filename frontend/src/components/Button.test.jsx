@@ -10,6 +10,6 @@ describe("Button", () => {
 
   it("uses the primary style for an unknown variant", () => {
     render(<Button variant="unknown">Save resume</Button>);
-    expect(screen.getByRole("button", { name: "Save resume" })).toHaveClass("bg-brand");
+    expect(screen.getByRole("button", { name: "Save resume" })).toHaveClass("button--primary");
   });
 });

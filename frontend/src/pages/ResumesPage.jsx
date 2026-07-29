@@ -17,7 +17,9 @@ export const ResumesPage = () => {
         </div>
         <div className="page-header__actions">
           <Link to="/resumes/deleted"><Button variant="secondary">Recently deleted</Button></Link>
-          <Link to="/resumes/new"><Button>+ New resume</Button></Link>
+          <Link to="/resumes/new">
+            <Button className="new-resume-button"><AppIcon name="plus" size={17} /> New resume</Button>
+          </Link>
         </div>
       </header>
       {isLoading ? <CardSkeleton count={6} className="resume-grid" /> : error ? (

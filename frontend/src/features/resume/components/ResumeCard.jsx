@@ -38,18 +38,30 @@ export const ResumeCard = ({ resume }) => {
 
   return (
     <Card className="resume-card">
-      <div className="document-thumbnail"><AppIcon name="documentReady" /><i /><i /><i /><i /></div>
+      <div className="document-thumbnail">
+        <span className="document-thumbnail__icon"><AppIcon name="documentReady" size={28} /></span>
+        <i /><i /><i /><i />
+      </div>
       <div className="resume-card__content">
         <p className="eyebrow">DRAFT</p>
         <h3>{resume.title}</h3>
         <p>{resume.summary || "No professional summary yet."}</p>
         <div className="resume-card__actions">
-          <Link to={`/resumes/${resume.id}`} className="resume-card__edit-action">
-            <AppIcon name="coverLetter" size={17} />
-            <span>Continue editing</span>
-            <AppIcon name="expand" size={16} className="resume-card__edit-arrow" />
-          </Link>
           <div className="resume-card__utilities">
+            <Button
+              type="button"
+              variant="ghost"
+              className="resume-card__icon-action resume-card__icon-action--danger resume-card__delete-action"
+              aria-label="Delete"
+              title="Delete resume"
+              disabled={duplicate.isPending || remove.isPending}
+              onClick={() => {
+                setMessage("");
+                setConfirmingDelete(true);
+              }}
+            >
+              <AppIcon name="trash" size={18} />
+            </Button>
             <Button
               type="button"
               variant="ghost"
@@ -62,22 +74,16 @@ export const ResumeCard = ({ resume }) => {
                 duplicate.mutate();
               }}
             >
-              <AppIcon name="copy" size={16} />
+              <AppIcon name="copy" size={18} />
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="resume-card__icon-action resume-card__icon-action--danger"
-              aria-label="Delete"
-              title="Delete resume"
-              disabled={duplicate.isPending || remove.isPending}
-              onClick={() => {
-                setMessage("");
-                setConfirmingDelete(true);
-              }}
+            <Link
+              to={`/resumes/${resume.id}`}
+              className="resume-card__edit-action"
+              aria-label={`Edit ${resume.title}`}
+              title={`Edit ${resume.title}`}
             >
-              <AppIcon name="trash" size={16} />
-            </Button>
+              <AppIcon name="resumeEdit" size={20} />
+            </Link>
           </div>
         </div>
         {message && !confirmingDelete && <p className="resume-card__error" role="alert">{message}</p>}

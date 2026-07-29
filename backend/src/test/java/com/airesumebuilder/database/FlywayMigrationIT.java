@@ -27,7 +27,9 @@ class FlywayMigrationIT {
         MigrateResult result = flyway.migrate();
         assertThat(result.success).isTrue();
         int expectedMigrationCount = flyway.info().all().length;
-        assertThat(result.migrationsExecuted).isEqualTo(expectedMigrationCount);
+        // Another integration test may have migrated the shared, fresh CI schema first.
+        // In either order Flyway must either apply the complete history or find it current.
+        assertThat(result.migrationsExecuted).isIn(0, expectedMigrationCount);
         flyway.validate();
 
         try (Connection connection = DriverManager.getConnection(url, username, password);

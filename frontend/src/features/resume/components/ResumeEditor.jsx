@@ -16,6 +16,7 @@ import { useUndoRedoState } from "../../../hooks/useUndoRedoState";
 import { validateResume } from "../../../validators/resumeValidator";
 import { generateResumeSummary } from "../../ai/api/aiApi";
 import { getProfile } from "../../profile/api/profileApi";
+import { applyTemplate, listTemplates } from "../../templates/api/templateApi";
 import {
   createResume,
   downloadResumePdf,
@@ -24,11 +25,15 @@ import {
   publishResume,
   updateResume,
 } from "../api/resumeApi";
+import { useResumeCompletion } from "../completion/useResumeCompletion";
 import { useResumeAutosave } from "../hooks/useResumeAutosave";
+import { ResumeCompletionCard } from "./ResumeCompletionCard";
+import { ResumeDocumentPreview } from "./ResumeDocumentPreview";
 import { TypedSectionsEditor } from "./TypedSectionsEditor";
 
 const emptyResume = {
   title: "",
+  fullName: "",
   summary: "",
   targetJobTitle: "",
   contactEmail: "",
@@ -58,16 +63,6 @@ const contentFields = [
   ["languagesContent", "Languages", "English: Fluent, Hindi: Conversational"],
 ];
 
-const PreviewSection = ({ title, content }) =>
-  content?.trim() ? (
-    <section>
-      <h3>{title}</h3>
-      <p>{content}</p>
-    </section>
-  ) : null;
-
-const TypedPreviewSections=({sections})=>{const labels={EDUCATION:"Education",EXPERIENCE:"Experience",PROJECT:"Projects",SKILL:"Skills",CERTIFICATION:"Certifications"};const text=(item)=>item.type==="EDUCATION"?`${item.degree} — ${item.institution}`:item.type==="EXPERIENCE"?`${item.role} — ${item.employer}`:item.type==="PROJECT"?`${item.name}${item.description?`\n${item.description}`:""}`:item.type==="SKILL"?`${item.name}${item.proficiencyLevel?` — ${item.proficiencyLevel}`:""}`:`${item.name}${item.issuedBy?` — ${item.issuedBy}`:""}`;return Object.entries(labels).map(([type,label])=>{const items=sections.filter((item)=>item.type===type);return items.length?<section key={type}><h3>{label}</h3>{items.map((item)=><p key={item.id}>{text(item)}</p>)}</section>:null;});};
-
 export const ResumeEditor = ({ resumeId }) => {
   const isNew = !resumeId;
   const location = useLocation();
@@ -86,7 +81,10 @@ export const ResumeEditor = ({ resumeId }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const profileQuery = useQuery({ queryKey: ["profile"], queryFn: getProfile });
+  const templatesQuery = useQuery({ queryKey: ["templates"], queryFn: listTemplates });
   const sectionsQuery=useQuery({queryKey:["resume-sections",resumeId],queryFn:()=>listSections(resumeId),enabled:!isNew});
+  const completion = useResumeCompletion(values, sectionsQuery.data ?? [], profileQuery.data ?? {});
+  const [applyingTemplate, setApplyingTemplate] = useState(false);
   const onSaved = useCallback(
     () => queryClient.invalidateQueries({ queryKey: ["resumes"] }),
     [queryClient],
@@ -218,14 +216,31 @@ export const ResumeEditor = ({ resumeId }) => {
     }
   };
 
-  const previewStyle = {
-    "--resume-font": values.fontFamily === "TIMES" ? "Georgia, serif" : values.fontFamily === "COURIER" ? '"DM Mono", monospace' : "Arial, sans-serif",
-    "--resume-size": `${values.fontSize}px`,
-    "--resume-leading": values.lineSpacing,
-    "--resume-section-space": `${values.sectionSpacing}px`,
-    "--resume-margin": `${Math.round(values.pageMargin * 0.72)}px`,
-  };
   const publish=async()=>{try{await publishResume(resumeId);setMessage("Resume published.");queryClient.invalidateQueries({queryKey:["resumes"]});}catch(error){setMessage(error.message);}};
+  const selectTemplate = async ({ target }) => {
+    const templateId = Number(target.value);
+    const template = templatesQuery.data?.find((item) => item.id === templateId);
+    if (!template || isNew) return;
+    setApplyingTemplate(true);
+    setMessage("");
+    try {
+      await applyTemplate({ templateId, resumeId: Number(resumeId) });
+      setValues((current) => ({ ...current, templateId, templateConfiguration: template.configuration }));
+      await queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      setMessage(`${template.name} template applied.`);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setApplyingTemplate(false);
+    }
+  };
+
+  const openCompletionSection = (sectionId) => {
+    if (["personal", "links"].includes(sectionId)) setCurrentStep(0);
+    else if (sectionId === "summary") setCurrentStep(1);
+    else setCurrentStep(2);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <main className="editor-page">
@@ -242,6 +257,7 @@ export const ResumeEditor = ({ resumeId }) => {
         </div>
       </header>
       {!isNew&&<nav className="builder-subnav" aria-label="Resume tools"><Link to={`/resumes/${resumeId}/edit`}>Edit</Link><Link to={`/resumes/${resumeId}/preview`}>Full preview</Link><Link to={`/resumes/${resumeId}/ats-check`}>ATS check</Link><Link to={`/resumes/${resumeId}/versions`}>Versions</Link><Button type="button" variant="ghost" onClick={publish}>Publish</Button></nav>}
+      <ResumeCompletionCard completion={completion} onSectionSelect={openCompletionSection} />
       <div className="preview-mode-switch" aria-label="Builder view"><Button type="button" variant={viewMode==="edit"?"primary":"ghost"} onClick={()=>setViewMode("edit")}>Edit only</Button><Button type="button" variant={viewMode==="split"?"primary":"ghost"} onClick={()=>setViewMode("split")}>Split</Button><Button type="button" variant={viewMode==="preview"?"primary":"ghost"} onClick={()=>setViewMode("preview")}>Preview only</Button></div>
       <div className={`editor-grid editor-grid--wide editor-grid--${viewMode}`}>
         {viewMode!=="preview"&&<Card>
@@ -253,6 +269,7 @@ export const ResumeEditor = ({ resumeId }) => {
             ]}>
               {currentStep === 0 && <div className="form-grid">
                 <FormField id="title" label="Internal resume title" error={errors.title}><Input id="title" name="title" value={values.title} onChange={update} /></FormField>
+                <FormField id="fullName" label="Full name" error={errors.fullName}><Input id="fullName" name="fullName" value={values.fullName} onChange={update} autoComplete="name" placeholder="Your full name" /></FormField>
                 <FormField id="targetJobTitle" label="Professional title"><Input id="targetJobTitle" name="targetJobTitle" value={values.targetJobTitle} onChange={update} placeholder="Front-End Developer" /></FormField>
                 <FormField id="contactEmail" label="Contact email"><Input id="contactEmail" name="contactEmail" type="email" value={values.contactEmail} onChange={update} /></FormField>
                 <FormField id="phone" label="Phone"><Input id="phone" name="phone" value={values.phone} onChange={update} /></FormField>
@@ -264,8 +281,19 @@ export const ResumeEditor = ({ resumeId }) => {
                 <FormField id="summary" label="Career objective / professional summary" error={errors.summary}><Textarea id="summary" name="summary" rows="9" value={values.summary} onChange={update} /></FormField>
                 <Button type="button" variant="secondary" onClick={improveWithAi} disabled={generating}>{!generating && <AppIcon name="ai" size={18} />}{generating ? "Creating AI draft…" : "Improve with AI"}</Button>
               </>}
-              {currentStep === 2 && <div className="resume-section-fields"><TypedSectionsEditor resumeId={resumeId} onSections={(items)=>queryClient.setQueryData(["resume-sections",resumeId],items)}/>{!isNew&&<details className="legacy-sections"><summary>Legacy text sections</summary>{contentFields.map(([name,label,placeholder]) => <FormField key={name} id={name} label={label}><Textarea id={name} name={name} rows="5" value={values[name]} onChange={update} placeholder={placeholder} /></FormField>)}</details>}</div>}
+              {currentStep === 2 && <div className="resume-section-fields">
+                {!isNew && <TypedSectionsEditor resumeId={resumeId} onSections={(items)=>queryClient.setQueryData(["resume-sections",resumeId],items)}/>}
+                {isNew
+                  ? contentFields.map(([name,label,placeholder]) => <FormField key={name} id={name} label={label}><Textarea id={name} name={name} rows="5" value={values[name]} onChange={update} placeholder={placeholder} /></FormField>)
+                  : <details className="legacy-sections"><summary>Text sections</summary>{contentFields.map(([name,label,placeholder]) => <FormField key={name} id={name} label={label}><Textarea id={name} name={name} rows="5" value={values[name]} onChange={update} placeholder={placeholder} /></FormField>)}</details>}
+              </div>}
               {currentStep === 3 && <div className="customizer-grid">
+                <FormField id="templateId" label="Resume template">
+                  <Select id="templateId" name="templateId" value={values.templateId ?? ""} onChange={selectTemplate} disabled={isNew || applyingTemplate}>
+                    <option value="">{isNew ? "Save the resume before choosing a template" : "Choose a template"}</option>
+                    {(templatesQuery.data ?? []).map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}
+                  </Select>
+                </FormField>
                 <FormField id="fontFamily" label="Font"><Select id="fontFamily" name="fontFamily" value={values.fontFamily} onChange={update}><option value="HELVETICA">Arial / Helvetica</option><option value="TIMES">Times</option><option value="COURIER">Courier</option></Select></FormField>
                 <FormField id="fontSize" label={`Body size — ${values.fontSize} pt`}><Input id="fontSize" name="fontSize" type="range" min="9" max="13" step="0.5" value={values.fontSize} onChange={update} /></FormField>
                 <FormField id="lineSpacing" label={`Line spacing — ${values.lineSpacing}`}><Input id="lineSpacing" name="lineSpacing" type="range" min="1" max="1.8" step="0.05" value={values.lineSpacing} onChange={update} /></FormField>
@@ -278,15 +306,7 @@ export const ResumeEditor = ({ resumeId }) => {
             <div className="form-actions"><Button type="submit">{isNew ? "Create resume" : "Save now"}</Button>{!isNew && <Button type="button" variant="secondary" onClick={download} disabled={downloading}><AppIcon name="documentReady" size={18} />{downloading ? "Preparing PDF…" : "Download PDF"}</Button>}</div>
           </form>
         </Card>}
-        {viewMode!=="edit"&&<aside className="preview-paper resume-live-preview" style={previewStyle} aria-label="Live resume preview">
-          <p className="preview-name">{profileQuery.data ? `${profileQuery.data.firstName} ${profileQuery.data.lastName}` : "YOUR NAME"}</p>
-          <p className="resume-preview-role">{values.targetJobTitle || "Professional title"}</p>
-          <p className="resume-preview-contact">{[values.location,values.contactEmail,values.phone,values.githubUrl,values.linkedinUrl].filter(Boolean).join(" | ") || "Location | email@example.com | phone"}</p>
-          <div className="preview-rule" />
-          <PreviewSection title="Career Objective" content={values.summary} />
-          {sectionsQuery.data?.length?<TypedPreviewSections sections={sectionsQuery.data}/>:<><PreviewSection title="Skills" content={values.skillsContent} /><PreviewSection title="Experience" content={values.experienceContent} /><PreviewSection title="Projects" content={values.projectsContent} /><PreviewSection title="Certifications" content={values.certificationsContent} /><PreviewSection title="Education" content={values.educationContent} /></>}
-          <PreviewSection title="Languages" content={values.languagesContent} />
-        </aside>}
+        {viewMode!=="edit"&&<ResumeDocumentPreview values={values} sections={sectionsQuery.data??[]} />}
       </div>
       <UnsavedChangesDialog blocker={autosave.blocker} />
       <Modal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} title="Keyboard shortcuts">

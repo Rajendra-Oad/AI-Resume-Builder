@@ -25,6 +25,9 @@ public class Resume {
     @Column(name = "target_job_title", length = 255)
     private String targetJobTitle;
 
+    @Column(name = "full_name", length = 255)
+    private String fullName;
+
     @Column(nullable = false)
     private String status = "DRAFT";
 
@@ -103,6 +106,10 @@ public class Resume {
     public void setTargetJobTitle(String targetJobTitle) {
         this.targetJobTitle = targetJobTitle;
     }
+
+    public String getFullName() { return fullName; }
+
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getStatus() {
         return status;

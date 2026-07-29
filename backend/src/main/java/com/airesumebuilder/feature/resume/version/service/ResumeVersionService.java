@@ -92,6 +92,7 @@ public class ResumeVersionService {
         state.put("title", resume.getTitle());
         state.put("summary", resume.getSummary());
         state.put("targetJobTitle", resume.getTargetJobTitle());
+        state.put("fullName", resume.getFullName());
         state.put("status", resume.getStatus());
         state.put("contactEmail",resume.getContactEmail()); state.put("phone",resume.getPhone()); state.put("location",resume.getLocation());
         state.put("githubUrl",resume.getGithubUrl()); state.put("linkedinUrl",resume.getLinkedinUrl());
@@ -130,6 +131,7 @@ public class ResumeVersionService {
         resume.setTitle((String) state.get("title"));
         resume.setSummary((String) state.get("summary"));
         resume.setTargetJobTitle((String) state.get("targetJobTitle"));
+        resume.setFullName((String) state.get("fullName"));
         resume.setStatus((String) state.getOrDefault("status", "DRAFT"));
         resume.setContactEmail((String)state.get("contactEmail")); resume.setPhone((String)state.get("phone")); resume.setLocation((String)state.get("location"));
         resume.setGithubUrl((String)state.get("githubUrl")); resume.setLinkedinUrl((String)state.get("linkedinUrl"));
@@ -171,7 +173,7 @@ public class ResumeVersionService {
     private int number(Object value, int fallback) { return value instanceof Number number ? number.intValue() : fallback; }
     private Integer numberOrNull(Object value) { return value instanceof Number number ? number.intValue() : null; }
     private java.math.BigDecimal decimal(Object value,String fallback){return value==null?new java.math.BigDecimal(fallback):new java.math.BigDecimal(String.valueOf(value));}
-    private ResumeResponse response(Resume r){return new ResumeResponse(r.getId(),r.getTitle(),r.getSummary(),r.getTargetJobTitle(),r.getContactEmail(),r.getPhone(),r.getLocation(),r.getGithubUrl(),r.getLinkedinUrl(),r.getSkillsContent(),r.getExperienceContent(),r.getProjectsContent(),r.getEducationContent(),r.getCertificationsContent(),r.getLanguagesContent(),r.getFontFamily(),r.getFontSize(),r.getLineSpacing(),r.getSectionSpacing(),r.getPageMargin());}
+    private ResumeResponse response(Resume r){return new ResumeResponse(r.getId(),r.getTitle(),r.getSummary(),r.getTargetJobTitle(),r.getFullName(),r.getContactEmail(),r.getPhone(),r.getLocation(),r.getGithubUrl(),r.getLinkedinUrl(),r.getSkillsContent(),r.getExperienceContent(),r.getProjectsContent(),r.getEducationContent(),r.getCertificationsContent(),r.getLanguagesContent(),r.getFontFamily(),r.getFontSize(),r.getLineSpacing(),r.getSectionSpacing(),r.getPageMargin(),r.getTemplate()==null?null:r.getTemplate().getId(),r.getTemplate()==null?null:r.getTemplate().getConfiguration());}
 
     public record VersionSummary(long id, long resumeId, int versionNumber, String source, String label, Instant createdAt) {}
     public record VersionDetail(VersionSummary version, JsonNode snapshot) {}

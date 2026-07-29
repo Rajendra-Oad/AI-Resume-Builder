@@ -251,24 +251,24 @@
   width: min(100%, 590px);
 }
 
-/* Auth experience shares the landing page's indigo night palette. */
+/* Auth experience shares the landing page's monochrome night palette. */
 .auth-layout {
-  --auth-bg: #090a16;
-  --auth-surface: rgb(25 27 54 / 78%);
-  --auth-text: #f1f3ff;
-  --auth-muted: #a6abc4;
-  --auth-border: rgb(165 180 252 / 14%);
-  --auth-border-strong: rgb(129 140 248 / 32%);
-  --auth-accent: #6366f1;
-  --auth-accent-light: #a5b4fc;
+  --auth-bg: #000000;
+  --auth-surface: rgb(30 30 30 / 82%);
+  --auth-text: #ffffff;
+  --auth-muted: #a8a8a8;
+  --auth-border: rgb(255 255 255 / 8%);
+  --auth-border-strong: rgb(255 255 255 / 18%);
+  --auth-accent: #4d4d4d;
+  --auth-accent-light: #ffffff;
   position: relative;
   isolation: isolate;
   overflow: hidden;
   padding-top: 6rem;
   color: var(--auth-text);
   background:
-    radial-gradient(circle at 72% 12%, rgb(99 102 241 / 24%), transparent 34rem),
-    radial-gradient(circle at 8% 88%, rgb(67 56 202 / 15%), transparent 28rem),
+    radial-gradient(circle at 72% 12%, rgb(255 255 255 / 10%), transparent 34rem),
+    radial-gradient(circle at 8% 88%, rgb(77 77 77 / 16%), transparent 28rem),
     var(--auth-bg);
 }
 .auth-layout::before {
@@ -277,23 +277,23 @@
   z-index: -1;
   inset: 0;
   background-image:
-    linear-gradient(rgb(165 180 252 / 5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(165 180 252 / 5%) 1px, transparent 1px);
+    linear-gradient(rgb(255 255 255 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 5%) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(circle at center, black, transparent 76%);
 }
 .auth-layout[data-auth-theme="light"] {
-  --auth-bg: #f8f9ff;
+  --auth-bg: #ffffff;
   --auth-surface: rgb(255 255 255 / 82%);
-  --auth-text: #171832;
-  --auth-muted: #626781;
-  --auth-border: rgb(49 46 129 / 12%);
-  --auth-border-strong: rgb(79 70 229 / 26%);
-  --auth-accent: #4f46e5;
-  --auth-accent-light: #4338ca;
+  --auth-text: #111111;
+  --auth-muted: #4d4d4d;
+  --auth-border: rgb(0 0 0 / 12%);
+  --auth-border-strong: rgb(0 0 0 / 24%);
+  --auth-accent: #1e1e1e;
+  --auth-accent-light: #111111;
   background:
-    radial-gradient(circle at 72% 12%, rgb(99 102 241 / 16%), transparent 34rem),
-    radial-gradient(circle at 8% 88%, rgb(129 140 248 / 12%), transparent 28rem),
+    radial-gradient(circle at 72% 12%, rgb(0 0 0 / 7%), transparent 34rem),
+    radial-gradient(circle at 8% 88%, rgb(77 77 77 / 10%), transparent 28rem),
     var(--auth-bg);
 }
 .auth-layout::after {
@@ -305,7 +305,7 @@
   width: 44rem;
   height: 44rem;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(99 102 241 / 24%), transparent 68%);
+  background: radial-gradient(circle, rgb(255 255 255 / 10%), transparent 68%);
   filter: blur(4px);
   transform: translateX(-50%);
 }
@@ -485,6 +485,83 @@
 .auth-layout[data-auth-theme="light"] .auth-card input,
 .auth-layout[data-auth-theme="light"] .auth-card .password-input-wrap {
   background: rgb(255 255 255 / 76%);
+}
+
+/* Monochrome application palette: shared by sign in, registration and recovery. */
+.auth-layout > .brand .brand-logo {
+  box-shadow: 0 0 24px rgb(255 255 255 / 10%), inset 0 1px rgb(255 255 255 / 22%);
+}
+.auth-theme-toggle:focus-visible,
+.auth-card .auth-submit-button:focus-visible,
+.auth-card .recovery-form .button.full-width:focus-visible {
+  outline-color: rgb(255 255 255 / 28%);
+}
+.auth-card {
+  background: linear-gradient(145deg, var(--auth-surface), rgb(17 17 17 / 92%));
+  box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 45%), 0 0 4rem rgb(255 255 255 / 5%), inset 0 1px rgb(255 255 255 / 6%);
+}
+.auth-card input,
+.auth-card .password-input-wrap {
+  background: rgb(17 17 17 / 72%);
+}
+.auth-card input::placeholder { color: rgb(255 255 255 / 42%); }
+.auth-card input:focus,
+.auth-card .password-input-wrap:focus-within {
+  border-color: var(--auth-border-strong);
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 12%), 0 0 1.5rem rgb(255 255 255 / 5%);
+}
+.auth-card .button--primary,
+.auth-card .auth-submit-button,
+.auth-card .recovery-form .button.full-width {
+  color: #ffffff;
+  border-color: rgb(255 255 255 / 12%);
+  background-color: #3c3c3c;
+  background-image: linear-gradient(135deg, #4d4d4d, #1e1e1e);
+  box-shadow: 0 .65rem 2rem rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 16%);
+}
+.auth-card .button--primary:hover:not(:disabled),
+.auth-card .auth-submit-button:hover:not(:disabled),
+.auth-card .recovery-form .button.full-width:hover:not(:disabled) {
+  color: #ffffff;
+  background-color: #4d4d4d;
+  background-image: linear-gradient(135deg, #4d4d4d, #3c3c3c);
+  box-shadow: 0 .85rem 2.5rem rgb(0 0 0 / 36%), inset 0 1px rgb(255 255 255 / 20%);
+}
+.auth-card .auth-submit-button:active:not(:disabled) {
+  background-image: linear-gradient(135deg, #3c3c3c, #111111);
+  box-shadow: 0 .35rem 1rem rgb(0 0 0 / 28%);
+}
+.auth-card .auth-submit-button:disabled,
+.auth-card .recovery-form .button.full-width:disabled {
+  color: rgb(255 255 255 / 55%);
+  background-color: #1e1e1e;
+  background-image: linear-gradient(135deg, #3c3c3c, #1e1e1e);
+}
+.auth-card .button--secondary,
+.auth-card .button--ghost,
+.auth-card .password-checklist,
+.auth-card .password-visibility:hover,
+.auth-card .password-generate:hover {
+  background: rgb(255 255 255 / 7%);
+}
+.auth-card .password-creator,
+.auth-card .password-creator--orange,
+.auth-card .password-creator--yellow,
+.auth-card .password-creator--lime,
+.auth-card .password-creator--green,
+.auth-card .password-creator--diamond {
+  --password-soft: rgb(255 255 255 / 7%);
+}
+.auth-card .password-meter { background: rgb(255 255 255 / 10%); }
+.auth-layout[data-auth-theme="light"] .auth-card {
+  background: linear-gradient(145deg, rgb(255 255 255 / 96%), rgb(244 244 244 / 92%));
+  box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 12%), inset 0 1px #ffffff;
+}
+.auth-layout[data-auth-theme="light"] .auth-card input::placeholder { color: rgb(77 77 77 / 55%); }
+.auth-layout[data-auth-theme="light"] .auth-card .button--primary,
+.auth-layout[data-auth-theme="light"] .auth-card .auth-submit-button,
+.auth-layout[data-auth-theme="light"] .auth-card .recovery-form .button.full-width {
+  background-image: linear-gradient(135deg, #3c3c3c, #111111);
 }
 
 .auth-input-wrap { position: relative; }
@@ -695,7 +772,7 @@
 /* Keep password controls visually identical to the outlined auth inputs. */
 .auth-card .password-input-wrap {
   border: 1px solid var(--auth-border-strong);
-  background: rgb(9 10 22 / 58%);
+  background: rgb(17 17 17 / 72%);
   box-shadow: inset 0 1px rgb(255 255 255 / 4%);
 }
 .auth-card .password-input-wrap input {
@@ -707,8 +784,8 @@
 .auth-card .password-input-wrap:focus-within {
   border-color: var(--auth-accent);
   box-shadow:
-    0 0 0 3px rgb(99 102 241 / 18%),
-    0 0 1.5rem rgb(99 102 241 / 12%),
+    0 0 0 3px rgb(255 255 255 / 12%),
+    0 0 1.5rem rgb(255 255 255 / 5%),
     inset 0 1px rgb(255 255 255 / 6%);
 }
 .auth-card .password-input-wrap.has-error {
@@ -724,8 +801,8 @@
 }
 .auth-layout[data-auth-theme="light"] .auth-card .password-input-wrap:focus-within {
   box-shadow:
-    0 0 0 3px rgb(79 70 229 / 15%),
-    0 0 1.25rem rgb(99 102 241 / 9%),
+    0 0 0 3px rgb(0 0 0 / 14%),
+    0 0 1.25rem rgb(0 0 0 / 7%),
     inset 0 1px #fff;
 }
 
@@ -735,7 +812,7 @@
   border: 1px solid var(--auth-border-strong);
   outline: 0;
   color: var(--auth-text);
-  background: rgb(9 10 22 / 58%);
+  background: rgb(17 17 17 / 72%);
   box-shadow: inset 0 1px rgb(255 255 255 / 4%);
 }
 .auth-card .auth-input-wrap .auth-input:hover {
@@ -746,8 +823,8 @@
   border-color: var(--auth-accent);
   outline: 0;
   box-shadow:
-    0 0 0 3px rgb(99 102 241 / 18%),
-    0 0 1.5rem rgb(99 102 241 / 12%),
+    0 0 0 3px rgb(255 255 255 / 12%),
+    0 0 1.5rem rgb(255 255 255 / 5%),
     inset 0 1px rgb(255 255 255 / 6%);
 }
 .auth-layout[data-auth-theme="light"] .auth-card .auth-input-wrap .auth-input {
@@ -757,8 +834,8 @@
 .auth-layout[data-auth-theme="light"] .auth-card .auth-input-wrap .auth-input:focus,
 .auth-layout[data-auth-theme="light"] .auth-card .auth-input-wrap .auth-input:focus-visible {
   box-shadow:
-    0 0 0 3px rgb(79 70 229 / 15%),
-    0 0 1.25rem rgb(99 102 241 / 9%),
+    0 0 0 3px rgb(0 0 0 / 14%),
+    0 0 1.25rem rgb(0 0 0 / 7%),
     inset 0 1px #fff;
 }
 

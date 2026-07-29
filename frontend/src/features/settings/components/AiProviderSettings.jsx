@@ -9,6 +9,7 @@ import { FormField } from "../../../components/FormField";
 import { Input } from "../../../components/Input";
 import { RadioGroup } from "../../../components/RadioGroup";
 import { Select } from "../../../components/Select";
+import { FormSkeleton } from "../../../components/Skeleton";
 import {
   deleteProviderCredential,
   getAiSettings,
@@ -90,7 +91,12 @@ export const AiProviderSettings = () => {
         Use the platform AI allowance or securely connect your own provider account. Your key is
         encrypted on the server and is never displayed after saving.
       </p>
-      <AsyncState isLoading={query.isLoading} error={query.error?.message} onRetry={query.refetch}>
+      <AsyncState
+        isLoading={query.isLoading}
+        error={query.error?.message}
+        onRetry={query.refetch}
+        fallback={<FormSkeleton fields={3} />}
+      >
         <form onSubmit={saveChoice}>
           <RadioGroup
             legend="Who provides the API access?"

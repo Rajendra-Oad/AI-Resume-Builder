@@ -4,12 +4,13 @@ import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
 import { FormField } from "../../../components/FormField";
 import { Input } from "../../../components/Input";
-import { ModulePage } from "../../../components/ModulePage";
 import { Select } from "../../../components/Select";
+import { DetailSkeleton } from "../../../components/Skeleton";
 import { Textarea } from "../../../components/Textarea";
 import { createPrompt, providerHealth } from "../../ai/api/promptAdminApi";
 export const PromptAdminPanel = () => {
   const [health, setHealth] = useState([]);
+  const [healthLoading, setHealthLoading] = useState(true);
   const [form, setForm] = useState({
     workflow: "resume-summary",
     locale: "en-US",
@@ -20,7 +21,8 @@ export const PromptAdminPanel = () => {
   useEffect(() => {
     providerHealth()
       .then(setHealth)
-      .catch((error) => setMessage(error.message));
+      .catch((error) => setMessage(error.message))
+      .finally(() => setHealthLoading(false));
   }, []);
   const submit = async (event) => {
     event.preventDefault();
@@ -32,15 +34,12 @@ export const PromptAdminPanel = () => {
     }
   };
   return (
-    <ModulePage
-      eyebrow="ADMINISTRATION"
-      title="AI prompt management"
-      description="Create versioned prompt drafts and monitor providers."
-    >
-      <div className="editor-grid">
+    <div className="editor-grid">
         <Card>
           <h2>Provider health</h2>
-          {health.length ? (
+          {healthLoading ? (
+            <DetailSkeleton rows={2} className="skeleton-detail--nested" />
+          ) : health.length ? (
             health.map((item) => (
               <p key={item.provider}>
                 {item.provider}: <span className="status-pill">{item.status}</span>
@@ -84,7 +83,6 @@ export const PromptAdminPanel = () => {
             <Button>Create draft</Button>
           </form>
         </Card>
-      </div>
-    </ModulePage>
+    </div>
   );
 };

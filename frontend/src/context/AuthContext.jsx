@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
+import { notify } from "../components/NotificationProvider";
 import { logout, refreshSession } from "../features/auth/api/authApi";
 import { authSession } from "../services/authSession";
 
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }) => {
       signIn: (payload) => {
         authSession.setToken(payload.accessToken);
         setSession(payload);
+        notify.success({ title: "Welcome back", message: "You’re signed in securely." });
       },
       signOut: async () => {
         try {

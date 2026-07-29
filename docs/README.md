@@ -18,6 +18,7 @@ pages provide quick links for day-to-day development.
 | 08 | [Resume Domain Architecture](08_Resume_Domain_Architecture.md) | Resume lifecycle, business rules, versioning, validation, templates, analytics, and future growth. |
 | 09 | [UX & Design System](09_UX-Design-System.md) | Product UX principles, flows, accessibility, responsive behavior, states, and design standards. |
 | 10 | [Resume Builder Module](10_Resume_Builder_Module.md) | Builder-specific document model, editing lifecycle, autosave, preview, integrations, and quality rules. |
+| 11 | [Motion Experience Architecture](11_Motion_Experience_Architecture.md) | Library-neutral motion, scrolling, transition, accessibility, performance, and future-plugin blueprint; no runtime implementation. |
 
 ## Audits And Status
 

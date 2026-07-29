@@ -7,6 +7,7 @@ public record PatchResumeRequest(
     @Size(max=255) String title,
     @Size(max=2000) String summary,
     @Size(max=255) String targetJobTitle,
+    @Size(max=255) String fullName,
     @Size(max=255) @Email String contactEmail,
     @Size(max=50) String phone,
     @Size(max=255) String location,

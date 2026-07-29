@@ -6,6 +6,7 @@ import com.airesumebuilder.feature.ai.dto.response.AiSettingsResponse;
 import com.airesumebuilder.feature.ai.repository.AiUserSettingsRepository;
 import com.airesumebuilder.feature.ai.repository.AiUserSettingsRepository.Credential;
 import com.airesumebuilder.feature.ai.repository.AiUserSettingsRepository.Settings;
+import com.airesumebuilder.feature.auth.service.UserAccountQueryService;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -21,12 +22,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiUserSettingsService {
     private static final List<String> PROVIDERS = List.of("gemini", "openai");
     private final AiUserSettingsRepository settingsRepository;
+    private final UserAccountQueryService userAccounts;
     private final byte[] encryptionKey;
     private final SecureRandom random = new SecureRandom();
 
-    public AiUserSettingsService(AiUserSettingsRepository settingsRepository, @Value("${app.ai.user-key-encryption-key:}") String encodedKey) {
+    public AiUserSettingsService(
+            AiUserSettingsRepository settingsRepository,
+            UserAccountQueryService userAccounts,
+            @Value("${app.ai.user-key-encryption-key:}") String encodedKey) {
         this.settingsRepository = settingsRepository;
+        this.userAccounts = userAccounts;
         this.encryptionKey = decodeKey(encodedKey);
+    }
+
+    public AiSettingsResponse getForUser(String email) {
+        return get(userAccounts.requireIdByEmail(email));
+    }
+
+    public AiSettingsResponse updateForUser(String email, AiSettingsRequest request) {
+        return update(userAccounts.requireIdByEmail(email), request);
+    }
+
+    public AiSettingsResponse saveCredentialForUser(String email, String provider, String rawKey) {
+        return saveCredential(userAccounts.requireIdByEmail(email), provider, rawKey);
+    }
+
+    public AiSettingsResponse deleteCredentialForUser(String email, String provider) {
+        return deleteCredential(userAccounts.requireIdByEmail(email), provider);
     }
 
     @Transactional(readOnly = true)

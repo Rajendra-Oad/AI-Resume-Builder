@@ -18,7 +18,6 @@ const navigation = [
 ];
 
 const utilityNavigation = [
-  ["Notifications", "/notifications", "notifications"],
   ["Profile", "/profile", "profile"],
   ["Settings", "/settings", "settings"],
 ];
@@ -34,7 +33,7 @@ export const DashboardLayout = () => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [theme, setTheme] = useState(() => window.localStorage.getItem("theme") || "dark");
+  const [theme, setTheme] = useState(() => window.localStorage.getItem("theme") || "light");
   const closeCommand = useCallback(() => setIsCommandOpen(false), []);
 
   useEffect(() => setIsMobileOpen(false), [location.pathname]);
@@ -143,7 +142,6 @@ export const DashboardLayout = () => {
           </button>
           <div className="workspace-actions">
             <button className="topbar-action" type="button" aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}><AppIcon name={theme === "dark" ? "sun" : "moon"} size={18} /></button>
-            <NavLink className="topbar-action notification-action" to="/notifications" aria-label="Notifications"><AppIcon name="notifications" size={18} /><span aria-hidden="true" /></NavLink>
             <NavLink className="topbar-profile" to="/profile"><span className="avatar">{session?.email?.[0]?.toUpperCase() ?? "U"}</span><span>{session?.email?.split("@")[0] ?? "Account"}</span><AppIcon name="chevronDown" size={14} /></NavLink>
           </div>
         </header>

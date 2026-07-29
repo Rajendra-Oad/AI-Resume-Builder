@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AsyncState } from "../../../components/AsyncState";
 import { Card } from "../../../components/Card";
 import { ModulePage } from "../../../components/ModulePage";
+import { MetricSkeleton } from "../../../components/Skeleton";
 import { AiProviderSettings } from "../../settings";
 import { getAiUsage } from "../api/aiAssistantApi";
 export const AiAssistantPanel = () => {
@@ -29,20 +30,21 @@ export const AiAssistantPanel = () => {
             isLoading={query.isLoading}
             error={query.error?.message}
             onRetry={query.refetch}
+            fallback={<MetricSkeleton />}
           >
             <Card>
               <div className="metric-grid">
                 <div>
                   <span>Spent</span>
-              <strong>${query.data?.monthlyCostUsd ?? "0.00"}</strong>
+                  <strong>${query.data?.monthlyCostUsd ?? "0.00"}</strong>
                 </div>
                 <div>
                   <span>Remaining</span>
-              <strong>${query.data?.remainingUsd ?? "0.00"}</strong>
+                  <strong>${query.data?.remainingUsd ?? "0.00"}</strong>
                 </div>
                 <div>
                   <span>Limit</span>
-              <strong>${query.data?.monthlyBudgetUsd ?? "0.00"}</strong>
+                  <strong>${query.data?.monthlyBudgetUsd ?? "0.00"}</strong>
                 </div>
               </div>
             </Card>

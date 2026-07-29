@@ -312,15 +312,25 @@ stored in source control.
 
 ## Docker workflow
 
-Copy `docker/.env.example` to `docker/.env`, replace its placeholders, then run:
+The production AWS Compose deployment runs the backend and an unprivileged
+Nginx HTTPS proxy. It deliberately does not create MySQL because production uses
+the existing MySQL 8 service on EC2, and it does not build the frontend because
+the frontend is deployed on Vercel.
+
+Application settings and secrets are loaded at runtime from the ignored
+`backend/.env`. Compose-only TLS file paths are loaded from the ignored
+`docker/.env`.
 
 ```bash
-cd docker
-docker compose up --build
+cp docker/.env.example docker/.env
+docker compose -f docker/docker-compose.yml config --quiet
+docker compose -f docker/docker-compose.yml build backend
+docker compose -f docker/docker-compose.yml up -d backend
 ```
 
-The production-style Compose file starts MySQL, the backend, and the Nginx-served
-frontend. Redis and SMTP are optional and are not started by the default Compose file.
+The first successful backend startup applies Flyway migrations to
+`ai_resume_builder`. After verifying `/actuator/health`, start the Nginx service
+as described in the [AWS production deployment runbook](docs/Deployment.md).
 
 ## Troubleshooting
 
@@ -475,6 +485,11 @@ Future
 * Docker Compose
 * Vercel
 * Render / AWS
+
+Current AWS target: Ubuntu 24.04 on EC2 `t3.micro` in `ap-south-2`, with the
+Spring Boot backend container connecting to the existing host-installed MySQL
+database. See the [production EC2 runbook](docs/Deployment.md); the public IP is
+auto-assigned, so configure a stable address and backend domain before HTTPS.
 
 ---
 

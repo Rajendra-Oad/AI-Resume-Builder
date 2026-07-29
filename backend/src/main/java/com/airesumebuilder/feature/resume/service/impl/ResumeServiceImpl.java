@@ -79,6 +79,7 @@ public class ResumeServiceImpl implements ResumeService {
         resume.setTitle(request.title());
         resume.setSummary(request.summary());
         resume.setTargetJobTitle(request.targetJobTitle());
+        resume.setFullName(request.fullName());
         resume.setContactEmail(request.contactEmail());
         resume.setPhone(request.phone());
         resume.setLocation(request.location());
@@ -102,7 +103,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override @Transactional
-    public ResumeResponse patchResume(String ownerEmail,Long id,PatchResumeRequest request){Resume resume=findResume(ownerEmail,id);Map<String,Object> before=snapshot(resume);if(request.title()!=null){if(request.title().isBlank())throw new ValidationException("Title cannot be blank.");resume.setTitle(request.title().trim());}if(request.summary()!=null)resume.setSummary(blankToNull(request.summary()));if(request.targetJobTitle()!=null)resume.setTargetJobTitle(blankToNull(request.targetJobTitle()));if(request.contactEmail()!=null)resume.setContactEmail(blankToNull(request.contactEmail()));if(request.phone()!=null)resume.setPhone(blankToNull(request.phone()));if(request.location()!=null)resume.setLocation(blankToNull(request.location()));if(request.githubUrl()!=null)resume.setGithubUrl(blankToNull(request.githubUrl()));if(request.linkedinUrl()!=null)resume.setLinkedinUrl(blankToNull(request.linkedinUrl()));if(request.fontFamily()!=null)resume.setFontFamily(request.fontFamily());if(request.fontSize()!=null)resume.setFontSize(request.fontSize());if(request.lineSpacing()!=null)resume.setLineSpacing(request.lineSpacing());if(request.sectionSpacing()!=null)resume.setSectionSpacing(request.sectionSpacing());if(request.pageMargin()!=null)resume.setPageMargin(request.pageMargin());Resume saved=resumeRepository.save(resume);versionService.snapshot(saved,"USER_EDIT","Updated resume metadata");eventPublisher.publishEvent(new ResumeUpdatedEvent(saved.getId(),saved.getUser().getId(),before,snapshot(saved)));return toResponse(saved);}
+    public ResumeResponse patchResume(String ownerEmail,Long id,PatchResumeRequest request){Resume resume=findResume(ownerEmail,id);Map<String,Object> before=snapshot(resume);if(request.title()!=null){if(request.title().isBlank())throw new ValidationException("Title cannot be blank.");resume.setTitle(request.title().trim());}if(request.summary()!=null)resume.setSummary(blankToNull(request.summary()));if(request.targetJobTitle()!=null)resume.setTargetJobTitle(blankToNull(request.targetJobTitle()));if(request.fullName()!=null)resume.setFullName(blankToNull(request.fullName()));if(request.contactEmail()!=null)resume.setContactEmail(blankToNull(request.contactEmail()));if(request.phone()!=null)resume.setPhone(blankToNull(request.phone()));if(request.location()!=null)resume.setLocation(blankToNull(request.location()));if(request.githubUrl()!=null)resume.setGithubUrl(blankToNull(request.githubUrl()));if(request.linkedinUrl()!=null)resume.setLinkedinUrl(blankToNull(request.linkedinUrl()));if(request.fontFamily()!=null)resume.setFontFamily(request.fontFamily());if(request.fontSize()!=null)resume.setFontSize(request.fontSize());if(request.lineSpacing()!=null)resume.setLineSpacing(request.lineSpacing());if(request.sectionSpacing()!=null)resume.setSectionSpacing(request.sectionSpacing());if(request.pageMargin()!=null)resume.setPageMargin(request.pageMargin());Resume saved=resumeRepository.save(resume);versionService.snapshot(saved,"USER_EDIT","Updated resume metadata");eventPublisher.publishEvent(new ResumeUpdatedEvent(saved.getId(),saved.getUser().getId(),before,snapshot(saved)));return toResponse(saved);}
 
     @Override @Transactional
     public ResumeResponse publishResume(String ownerEmail,Long id){Resume resume=findResume(ownerEmail,id);if("PUBLISHED".equals(resume.getStatus()))return toResponse(resume);if(resume.getTitle()==null||resume.getTitle().isBlank())throw new ValidationException("A title is required before publishing.");Map<String,Object> before=snapshot(resume);resume.setStatus("PUBLISHED");Resume saved=resumeRepository.save(resume);versionService.snapshot(saved,"USER_EDIT","Published resume");eventPublisher.publishEvent(new ResumeUpdatedEvent(saved.getId(),saved.getUser().getId(),before,snapshot(saved)));return toResponse(saved);}
@@ -115,6 +116,7 @@ public class ResumeServiceImpl implements ResumeService {
         copy.setTitle(copyTitle(source.getTitle()));
         copy.setSummary(source.getSummary());
         copy.setTargetJobTitle(source.getTargetJobTitle());
+        copy.setFullName(source.getFullName());
         copy.setContactEmail(source.getContactEmail());
         copy.setPhone(source.getPhone());
         copy.setLocation(source.getLocation());
@@ -196,7 +198,7 @@ public class ResumeServiceImpl implements ResumeService {
     private String blankToNull(String value){return value==null||value.isBlank()?null:value.trim();}
 
     private ResumeResponse toResponse(Resume resume) {
-        return new ResumeResponse(resume.getId(),resume.getTitle(),resume.getSummary(),resume.getTargetJobTitle(),resume.getContactEmail(),resume.getPhone(),resume.getLocation(),resume.getGithubUrl(),resume.getLinkedinUrl(),resume.getSkillsContent(),resume.getExperienceContent(),resume.getProjectsContent(),resume.getEducationContent(),resume.getCertificationsContent(),resume.getLanguagesContent(),resume.getFontFamily(),resume.getFontSize(),resume.getLineSpacing(),resume.getSectionSpacing(),resume.getPageMargin());
+        return new ResumeResponse(resume.getId(),resume.getTitle(),resume.getSummary(),resume.getTargetJobTitle(),resume.getFullName(),resume.getContactEmail(),resume.getPhone(),resume.getLocation(),resume.getGithubUrl(),resume.getLinkedinUrl(),resume.getSkillsContent(),resume.getExperienceContent(),resume.getProjectsContent(),resume.getEducationContent(),resume.getCertificationsContent(),resume.getLanguagesContent(),resume.getFontFamily(),resume.getFontSize(),resume.getLineSpacing(),resume.getSectionSpacing(),resume.getPageMargin(),resume.getTemplate()==null?null:resume.getTemplate().getId(),resume.getTemplate()==null?null:resume.getTemplate().getConfiguration());
     }
 
     private DeletedResumeResponse toDeletedResponse(Resume resume) {
@@ -207,7 +209,7 @@ public class ResumeServiceImpl implements ResumeService {
     private Map<String,Object> snapshot(Resume resume) {
         Map<String,Object> state = new java.util.LinkedHashMap<>();
         state.put("title", resume.getTitle()); state.put("summary", resume.getSummary());
-        state.put("targetJobTitle", resume.getTargetJobTitle()); state.put("status", resume.getStatus());
+        state.put("targetJobTitle", resume.getTargetJobTitle()); state.put("fullName", resume.getFullName()); state.put("status", resume.getStatus());
         return state;
     }
 }

@@ -17,8 +17,9 @@ public class PdfExportRepository {
 
     public ResumeDocument resume(String email, long id) {
         return jdbc.query(
-            "SELECT r.*,CONCAT_WS(' ',u.first_name,u.last_name) full_name,u.id owner_id " +
-                "FROM resumes r JOIN users u ON u.id=r.user_id WHERE u.email=? AND r.id=? AND r.deleted_at IS NULL",
+            "SELECT r.*,u.id owner_id,t.configuration template_configuration " +
+                "FROM resumes r JOIN users u ON u.id=r.user_id LEFT JOIN templates t ON t.id=r.template_id " +
+                "WHERE u.email=? AND r.id=? AND r.deleted_at IS NULL",
             this::document,
             email,
             id
@@ -41,16 +42,19 @@ public class PdfExportRepository {
     }
 
     private ResumeDocument document(ResultSet r, int row) throws SQLException {
-        return new ResumeDocument(r.getLong("id"),r.getLong("owner_id"),r.getString("title"),r.getString("summary"),r.getString("target_job_title"),r.getString("full_name"),r.getString("contact_email"),r.getString("phone"),r.getString("location"),r.getString("github_url"),r.getString("linkedin_url"),r.getString("skills_content"),r.getString("experience_content"),r.getString("projects_content"),r.getString("education_content"),r.getString("certifications_content"),r.getString("languages_content"),r.getString("font_family"),r.getBigDecimal("font_size"),r.getBigDecimal("line_spacing"),r.getInt("section_spacing"),r.getInt("page_margin"));
+        return new ResumeDocument(r.getLong("id"),r.getLong("owner_id"),r.getString("title"),r.getString("summary"),r.getString("target_job_title"),r.getString("full_name"),r.getString("contact_email"),r.getString("phone"),r.getString("location"),r.getString("github_url"),r.getString("linkedin_url"),r.getString("skills_content"),r.getString("experience_content"),r.getString("projects_content"),r.getString("education_content"),r.getString("certifications_content"),r.getString("languages_content"),r.getString("font_family"),r.getBigDecimal("font_size"),r.getBigDecimal("line_spacing"),r.getInt("section_spacing"),r.getInt("page_margin"),r.getString("template_configuration"));
     }
 
     private Export export(ResultSet r, int row) throws SQLException {
         return new Export(r.getLong("id"),r.getLong("resume_id"),r.getString("file_name"),r.getLong("byte_size"),r.getString("content_sha256"),r.getTimestamp("created_at").toInstant());
     }
 
-    public record ResumeDocument(long id,long userId,String title,String summary,String targetJobTitle,String fullName,String contactEmail,String phone,String location,String githubUrl,String linkedinUrl,String skills,String experience,String projects,String education,String certifications,String languages,String fontFamily,BigDecimal fontSize,BigDecimal lineSpacing,int sectionSpacing,int pageMargin) {
+    public record ResumeDocument(long id,long userId,String title,String summary,String targetJobTitle,String fullName,String contactEmail,String phone,String location,String githubUrl,String linkedinUrl,String skills,String experience,String projects,String education,String certifications,String languages,String fontFamily,BigDecimal fontSize,BigDecimal lineSpacing,int sectionSpacing,int pageMargin,String templateConfiguration) {
+        public ResumeDocument(long id,long userId,String title,String summary,String targetJobTitle,String fullName,String contactEmail,String phone,String location,String githubUrl,String linkedinUrl,String skills,String experience,String projects,String education,String certifications,String languages,String fontFamily,BigDecimal fontSize,BigDecimal lineSpacing,int sectionSpacing,int pageMargin) {
+            this(id,userId,title,summary,targetJobTitle,fullName,contactEmail,phone,location,githubUrl,linkedinUrl,skills,experience,projects,education,certifications,languages,fontFamily,fontSize,lineSpacing,sectionSpacing,pageMargin,null);
+        }
         public ResumeDocument(long id,long userId,String title,String summary,String targetJobTitle,String fullName) {
-            this(id,userId,title,summary,targetJobTitle,fullName,null,null,null,null,null,null,null,null,null,null,null,"HELVETICA",new BigDecimal("10.5"),new BigDecimal("1.25"),12,42);
+            this(id,userId,title,summary,targetJobTitle,fullName,null,null,null,null,null,null,null,null,null,null,null,"HELVETICA",new BigDecimal("10.5"),new BigDecimal("1.25"),12,42,null);
         }
     }
     public record Export(long id,long resumeId,String fileName,long byteSize,String sha256,Instant createdAt) {}

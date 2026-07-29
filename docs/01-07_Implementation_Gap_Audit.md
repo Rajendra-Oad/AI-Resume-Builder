@@ -4,15 +4,25 @@ Audit date: 2026-07-23
 
 ## Executive result
 
-The repository has a strong scaffold and working vertical slices for authentication, resume metadata CRUD, frontend routing/design primitives, database migrations, and a provider-abstracted AI gateway. It is **not complete against guides 01–07**.
+The repository has working vertical slices for authentication, typed resume editing and
+versioning, frontend routing/design primitives, database migrations, product modules, and
+a provider-abstracted AI gateway. It is **not complete against guides 01–07**.
 
 The most important remaining work is:
 
-1. Complete the remaining deep resume-section CRUD and workflow-specific contracts; profiles, templates, versioning, ATS, jobs, notifications, PDF, audit, subscriptions, analytics, and administration now have layered REST implementations.
+1. Complete the remaining resume-domain gaps: typed languages, date-safe education and
+   experience fields, template deletion/reference rules, retention behavior, and
+   workflow-specific contracts. Typed section CRUD for education, experience, projects,
+   skills, and certifications is complete; profiles, templates, versioning, ATS, jobs,
+   notifications, PDF, audit, subscriptions, analytics, and administration have REST
+   implementations.
 2. Complete the remaining database-to-application behavior: JPA/domain mappings now cover the major migrated tables, while some still rely on JDBC repositories and need richer repository/service lifecycle rules.
 3. Complete the remaining authentication lifecycle behavior: refresh-session design, security audit events, verification resend support, and account lifecycle endpoints.
 4. Complete AI response schemas, workflow-specific validation, idempotency, retry/backoff, prompt testing, and observability.
-5. Expand automated testing from a few unit/component tests to controller, repository, migration, integration, security, accessibility, and end-to-end coverage.
+5. Expand the existing automated test base—57 backend tests, 46 frontend tests, seven
+   Playwright scenarios, and a real-MySQL Flyway test—into broader controller, repository,
+   upgrade-path migration, transactional, security-filter, accessibility, and end-to-end
+   coverage.
 
 Future-only items explicitly identified by the guides—microservices, social login, MFA, SSO, multi-device management UI, sharding, offline support, collaboration, premium payments, and additional deployment scale—are not counted as current gaps.
 
@@ -46,10 +56,10 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 - [Completed] A dedicated CI job executes and validates all Flyway migrations against a
   fresh MySQL 8.4 service and verifies representative schema and seed data.
 - Confirm/enforce branch protection, PR review, and commit conventions in repository settings; these cannot be verified from source files alone.
-- Behavioral coverage was expanded to 54 passing backend tests and 37 frontend
-  tests. Enforced floors are 24% backend lines and 12%/13%/10%/20% frontend
-  lines/statements/functions/branches. Broader controller, persistence, page-workflow,
-  accessibility, and end-to-end coverage remains outstanding.
+- Behavioral coverage was expanded to 57 passing backend tests, 46 frontend unit/component
+  tests, and seven Playwright scenarios. Enforced floors are 24% backend lines and
+  12%/13%/10%/20% frontend lines/statements/functions/branches. Broader controller,
+  persistence, page-workflow, accessibility, and end-to-end coverage remains outstanding.
 
 ## 02 — Backend Architecture
 
@@ -64,7 +74,10 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 - [Completed] Direct `JdbcTemplate` business logic was removed from `AiPromptAdminController`, prompt resolution, AI usage/budget orchestration, async AI job orchestration, and user AI settings. Persistence is isolated in feature-owned repositories, prompt lifecycle operations and usage writes are atomic, and async job state transitions use independent transaction boundaries.
 - Stop `feature/ai` from directly using `UserRepository`; depend on a public user/identity service interface to preserve feature independence.
 - Add missing mapper layer usage. A generic mapper type exists, but most mappings are hand-written or absent.
-- Add structured JSON logging/profile configuration, request latency metrics, security event logs, and persistent audit logging. `ResumeAuditListener` currently logs one event to application logs only.
+- [Partially completed] Persistent audit logging is implemented for resume create, update,
+  and delete events through transactional listeners, and successful administrator role/status
+  changes are stored in admin action history. Structured JSON logging, request-latency
+  metrics, and the broader security-event coverage listed in section 06 remain outstanding.
 - Add dedicated domain events and listeners for AI completion/failure, password/security changes, notifications, ATS completion, exports, and admin actions.
 - Add controller tests, repository tests, ownership/authorization tests, transactional integration tests, and architecture boundary tests.
 - Add caching only where justified and prove invalidation behavior; configuration exists but most domain reads do not use it.
@@ -86,7 +99,11 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 - [Completed] Resume creation/editing produces immutable structured snapshots; owner-scoped history, detail, concurrency-safe numbering, and rollback-as-a-new-version are implemented.
 - Implement template deletion/reference rules and template repository/service APIs.
 - Implement purge/retention jobs for expired refresh, reset, verification, AI, audit, and notification data.
-- Add database migration integration tests using a real MySQL/Testcontainers instance, including clean install and upgrade-path tests.
+- [Partially completed] `FlywayMigrationIT` runs in CI against a fresh MySQL 8.4 service,
+  applies and validates every migration, and checks representative tables, columns, and
+  seed rows. An upgrade-path fixture from a previously released schema and lifecycle/data
+  migration assertions remain outstanding; the test uses a CI service container rather
+  than Testcontainers managed from Java.
 - Add explicit delete/cascade/restrict behavior to every FK where the blueprint specifies lifecycle semantics; many FKs rely on MySQL defaults without documented application handling.
 - Verify sensitive-column encryption/retention requirements and database-user least privilege in deployment configuration.
 
@@ -105,13 +122,30 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 - [Completed] The shared API layer is split into the documented `axiosInstance`, request interceptor, response interceptor, and single-flight `tokenRefresh` modules. Feature APIs continue to use one configured Axios client.
 - [Completed] Authentication, password recovery, and password settings use React Hook Form with shared `FormField`/`Input` primitives and consistent client validation/submission state. Ordinary checkbox and file controls use shared primitives; only intentionally custom radio-card controls render their native input internally.
 - [Completed] Route/feature-level error boundaries wrap authentication, dashboard, resume, templates, ATS, job matching, cover letters, notifications, profile, settings, AI assistant, admin, and onboarding routes. They reset on navigation and provide a focused retry/dashboard recovery UI.
-- Replace raw visual values and the large global CSS sheet with consistently enforced semantic tokens/Tailwind utilities. The current CSS still contains many raw colors, sizes, and one-off values.
+- [Completed] The authenticated application shell has responsive navigation: desktop and
+  laptop users can collapse the sidebar to an icon rail with persisted preference, while
+  mobile users receive an off-canvas drawer with a sticky launcher, backdrop dismissal,
+  close control, Escape handling, and automatic close after navigation.
+- [Completed] The profile workspace has one canonical editable phone field, colocated
+  verification controls, ordered editable/read-only sections, and single-column mobile
+  behavior instead of repeating the phone value in the account summary.
+- [Completed] Shared visual primitives are defined in the Tailwind `@theme` layer and
+  exposed through semantic CSS variables for color roles, typography, focus treatments,
+  radii, shadows, overlays, and application layout dimensions. The former 1,925-line
+  global stylesheet is split by responsibility into primitives, marketing/auth,
+  workspace, and workflow modules. Shared React primitives use semantic Tailwind
+  utilities, while component-specific geometry remains in the scoped modules. Automated
+  enforcement scans both component code and CSS, rejecting raw colors, arbitrary visual
+  utilities, un-tokenized font families, border radii, and box shadows.
 - [Completed] Automated import-order enforcement, accessibility tests, keyboard/focus tests,
   query/hook tests, and route-guard tests are implemented. Playwright browser coverage now
   verifies public keyboard navigation and not-found handling plus protected-route redirects,
   sign-in/dashboard loading, onboarding enforcement, authenticated resume navigation, and
   deleted-resume restoration using deterministic API fixtures.
-- Add skeleton states to every meaningful server-dependent view and AI job progress UI; several modules only show generic status cards.
+- [Partially completed] Reusable card, list, and AI-job skeletons are implemented and used
+  by resume lists, templates, notifications, job matching, ATS analysis, and cover-letter
+  generation. Profile, settings, AI assistant, admin, version history/detail, typed
+  sections, and full preview still use generic loaders or status text.
 - Add virtualization only when real long job/admin lists exist; this remains correctly deferred for now.
 
 ## 05 — REST API Architecture
@@ -131,7 +165,15 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 - [Completed] Resume metadata patching, owner-scoped typed section CRUD/reordering, version list/detail, publish/rollback, and resume-scoped PDF export are implemented. Section and metadata mutations create immutable snapshots for later rollback.
 - [Completed] Template list/detail/apply APIs are implemented with resume ownership checks.
 - [Completed] Notification list/read/read-all and owner-scoped notification preference APIs are implemented. Preferences persist email, in-app, job-alert, and AI-update delivery choices and are editable in the notification workspace.
-- [Partially completed] Admin user status/role operations, action history, audit, and aggregate analytics APIs are implemented. The `/api/v1/admin/**` contract is ADMIN-protected, validates allowed roles/statuses, prevents administrators from removing their own access, and records successful changes in the action history. Dedicated controller/service unit tests exist, but security-filter, ownership, repository, and real-MySQL integration coverage for the complete administrative workflow remain outstanding.
+- [Completed] Admin user status/role operations, action history, audit, and aggregate
+  analytics APIs are implemented. The `/api/v1/admin/**` contract is ADMIN-protected,
+  validates allowed roles/statuses, prevents administrators from removing their own
+  access, revokes active refresh tokens when an account is made inactive, and attributes
+  successful changes to the acting administrator. Controller/service tests cover request
+  delegation, validation, pagination, and self-protection; security-chain tests prove
+  anonymous rejection, non-admin rejection, and admin access; and `AdminWorkflowIT`
+  verifies repository persistence, action attribution, token revocation, self-protection,
+  audit history, and aggregate analytics against migrated MySQL.
 - Implement file upload/download validation, content-type/size enforcement, storage abstraction, signed/authorized downloads, and async PDF jobs.
 - Implement workflow-specific AI endpoints, retry endpoint, and required `Idempotency-Key` handling. The current generic `/ai/generate` contract does not match the blueprint’s resource-oriented endpoints.
 - ATS analysis and owner-scoped report endpoints are implemented; broader workflow-specific endpoints remain outstanding.
@@ -185,13 +227,30 @@ Platform-managed AI versus encrypted per-user BYOK selection is now implemented 
 
 ## Recommended execution order
 
-1. **Security correctness:** email verification lifecycle, refresh-token decision, security audit events, and security integration tests.
-2. **Contract correctness:** complete OpenAPI 3.1 and align endpoints/DTOs before adding more UI.
-3. **Resume core:** typed section CRUD, version snapshots, template application, export, and full frontend editor.
-4. **AI reliability:** typed validation, idempotency, prompt versioning, retries/circuit breaker, and observability.
-5. **Product modules:** ATS, jobs, notifications, profile, admin, analytics, and PDF.
-6. **Quality gates:** MySQL migration tests, integration/E2E/accessibility tests, coverage thresholds, and security scanning.
+1. **Security correctness:** decide and implement race-safe refresh-token rotation (or
+   document the reuse decision), persist security audit events, add account lifecycle
+   endpoints, externalize cookie policy, and expand security integration tests.
+2. **Contract correctness:** complete OpenAPI 3.1, workflow-specific AI contracts,
+   idempotency, file/storage contracts, and high-volume filtering/pagination.
+3. **Remaining resume/database correctness:** typed languages, date-safe section fields,
+   template deletion/reference rules, explicit FK lifecycle behavior, retention jobs, and
+   migration upgrade-path testing.
+4. **AI reliability:** typed validation, prompt variables and exact version references,
+   retry classification/backoff, circuit breaking, failed-attempt persistence, safety, and
+   observability.
+5. **Quality depth:** repository, security-filter, transactional, failure-path,
+   accessibility, and broader browser workflow coverage.
 
 ## Verification note
 
-The frontend test suite (18 files, 37 tests) and backend `mvn verify` (54 tests) passed on 2026-07-23. Backend verification includes cross-module resume/version/audit behavior and JaCoCo threshold checks; CI executes Flyway against MySQL. Browser end-to-end depth and broader behavioral coverage remain outstanding.
+The frontend test suite (18 files, 46 tests) and backend `mvn verify` (57 tests) passed on
+2026-07-23. Backend verification includes cross-module resume/version/audit behavior and
+JaCoCo threshold checks. CI executes Flyway against MySQL 8.4 and runs seven Playwright
+scenarios across two specification files. Browser end-to-end depth and broader behavioral
+coverage remain outstanding.
+
+This reconciliation inspected the current controllers, services, repositories, entities,
+migrations, security configuration, frontend feature routes/components, CI workflows, and
+test inventories. A status is marked `[Completed]` only where the present repository
+contains the implementation; mixed implementations are marked `[Partially completed]`
+with their remaining work stated explicitly.

@@ -185,6 +185,29 @@ h2 {
   background: transparent;
   color: var(--forest);
 }
+[data-theme="dark"] .app-shell .button--primary {
+  color: #ffffff;
+  background: #2f6b53;
+}
+[data-theme="dark"] .app-shell .button--primary:hover:not(:disabled) {
+  color: #ffffff;
+  background: #255641;
+}
+[data-theme="dark"] .app-shell .button--secondary {
+  color: #dceae3;
+  background: #15251e;
+}
+[data-theme="dark"] .app-shell .button--secondary:hover:not(:disabled) {
+  color: #ffffff;
+  background: #1c3329;
+}
+[data-theme="dark"] .app-shell .button--ghost {
+  color: #a8cdbb;
+}
+[data-theme="dark"] .app-shell .button--ghost:hover:not(:disabled) {
+  color: #dceae3;
+  background: rgb(168 205 187 / 8%);
+}
 .full-width {
   width: 100%;
 }

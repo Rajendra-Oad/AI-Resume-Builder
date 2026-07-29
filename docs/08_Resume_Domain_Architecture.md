@@ -1,4 +1,4 @@
-# Resume Domain Architecture Blueprint
+y# Resume Domain Architecture Blueprint
 ### AI Resume Builder — Official Domain Guide
 **Audience:** Backend, Frontend, Database, AI, QA, Product
 **Scope:** Business domain only — no code, SQL, APIs, or UI implementation

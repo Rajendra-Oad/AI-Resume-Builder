@@ -7,6 +7,7 @@ public record ResumeResponse(
     String title,
     String summary,
     String targetJobTitle,
+    String fullName,
     String contactEmail,
     String phone,
     String location,
@@ -22,10 +23,12 @@ public record ResumeResponse(
     BigDecimal fontSize,
     BigDecimal lineSpacing,
     Integer sectionSpacing,
-    Integer pageMargin
+    Integer pageMargin,
+    Long templateId,
+    String templateConfiguration
 ) {
     public ResumeResponse(Long id, String title, String summary) {
-        this(id, title, summary, null, null, null, null, null, null, null, null, null, null, null, null,
-            "HELVETICA", new BigDecimal("10.5"), new BigDecimal("1.25"), 12, 42);
+        this(id, title, summary, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            "HELVETICA", new BigDecimal("10.5"), new BigDecimal("1.25"), 12, 42, null, null);
     }
 }

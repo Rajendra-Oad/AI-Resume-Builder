@@ -13,6 +13,7 @@ public record UpdateResumeRequest(
     @NotBlank(message = "Title is required") @Size(max = 255) String title,
     @NotBlank(message = "Summary is required") @Size(max = 2000) String summary,
     @Size(max = 255) String targetJobTitle,
+    @NotBlank(message = "Full name is required") @Size(max = 255) String fullName,
     @Size(max = 255) String contactEmail,
     @Size(max = 50) String phone,
     @Size(max = 255) String location,
@@ -31,7 +32,7 @@ public record UpdateResumeRequest(
     @Min(24) @Max(72) Integer pageMargin
 ) {
     public UpdateResumeRequest(String title, String summary) {
-        this(title, summary, null, null, null, null, null, null, null, null, null, null, null, null,
+        this(title, summary, null, null, null, null, null, null, null, null, null, null, null, null, null,
             "HELVETICA", new BigDecimal("10.5"), new BigDecimal("1.25"), 12, 42);
     }
 }
