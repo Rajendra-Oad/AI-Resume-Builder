@@ -4,6 +4,7 @@ Thumbs.db
 
 # Java
 **/target/
+**/.dependency-check-data/
 *.class
 *.jar
 *.war
