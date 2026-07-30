@@ -48,10 +48,10 @@ export const AuthForm = ({ mode }) => {
           <FormField id="firstName" label="First name" error={errors.firstName?.message}><AuthInput icon="user" id="firstName" autoComplete="given-name" placeholder="Alex" {...register("firstName", { required: "First name is required.", maxLength: { value: 100, message: "Use 100 characters or fewer." } })} /></FormField>
           <FormField id="lastName" label="Last name" error={errors.lastName?.message}><AuthInput icon="user" id="lastName" autoComplete="family-name" placeholder="Morgan" {...register("lastName", { required: "Last name is required.", maxLength: { value: 100, message: "Use 100 characters or fewer." } })} /></FormField>
         </div>}
-        <FormField id="email" label={isRegister ? "Email address" : "Email or verified phone number"} error={errors.email?.message}>
-          <AuthInput id="email" type={isRegister ? "email" : "text"} autoComplete={isRegister ? "email" : "username"} placeholder={isRegister ? "you@example.com" : "you@example.com or +91 98765 43210"} {...register("email", { required: "Email or phone is required." })} />
+        <FormField id="email" label="Email address" error={errors.email?.message}>
+          <AuthInput id="email" type="email" autoComplete="email" placeholder="you@example.com" {...register("email", { required: "Email is required." })} />
         </FormField>
-        {isRegister && <FormField id="phone" label="Mobile number" hint="Optional. Verify it from Profile to enable phone sign-in." error={errors.phone?.message}><AuthInput icon="phone" id="phone" type="tel" autoComplete="tel" placeholder="+91 98765 43210" {...register("phone", { pattern: { value: /^[+0-9 ()-]{10,20}$/, message: "Enter a valid phone number." } })} /></FormField>}
+        {isRegister && <FormField id="phone" label="Mobile number" hint="Optional contact information." error={errors.phone?.message}><AuthInput icon="phone" id="phone" type="tel" autoComplete="tel" placeholder="+91 98765 43210" {...register("phone", { pattern: { value: /^[+0-9 ()-]{10,20}$/, message: "Enter a valid phone number." } })} /></FormField>}
         {isRegister
           ? <PasswordCreationFields register={register} setValue={setValue} password={watch("password")} confirmPassword={watch("confirmPassword")} email={watch("email")} errors={errors} />
           : <PasswordLoginField register={register} error={errors.password?.message} />}

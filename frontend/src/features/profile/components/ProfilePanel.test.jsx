@@ -9,8 +9,6 @@ vi.mock("../api/profileApi", () => ({
   getProfile: vi.fn(),
   updateProfile: vi.fn(),
   completeOnboarding: vi.fn(),
-  sendPhoneOtp: vi.fn(),
-  verifyPhoneOtp: vi.fn(),
   uploadProfilePhoto: vi.fn(),
   deleteProfilePhoto: vi.fn(),
   getProfilePhoto: vi.fn(),
@@ -25,7 +23,6 @@ const profile = {
   displayName: "Asha",
   phone: "",
   location: "Bengaluru",
-  phoneVerified: false,
 };
 
 const renderPanel = () => {

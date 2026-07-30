@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(
     controllers = AdminController.class,
     properties = {
-        "DB_URL=jdbc:mysql://localhost:3306/test",
+        "DB_URL=jdbc:postgresql://localhost:5432/test",
         "DB_PASSWORD=test-database-password",
         "JWT_SECRET=01234567890123456789012345678901"
     }

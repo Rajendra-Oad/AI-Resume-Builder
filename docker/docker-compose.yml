@@ -9,8 +9,8 @@ services:
     image: ai-resume-builder-backend:latest
     restart: unless-stopped
 
-    # Host networking intentionally preserves DB_URL=jdbc:mysql://localhost:3306:
-    # the container reaches the existing EC2-hosted MySQL service directly.
+    # Host networking intentionally preserves DB_URL=jdbc:postgresql://localhost:5432:
+    # the container reaches the existing EC2-hosted PostgreSQL service directly.
     network_mode: host
     env_file:
       - ../backend/.env

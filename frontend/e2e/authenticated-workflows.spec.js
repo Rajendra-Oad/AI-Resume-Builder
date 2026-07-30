@@ -26,7 +26,7 @@ test("a user can sign in and see the dashboard", async ({ page }) => {
   });
 
   await page.goto("/login");
-  await page.getByLabel("Email or verified phone number").fill("alex@example.com");
+  await page.getByLabel("Email address").fill("alex@example.com");
   await page.getByLabel("Password").fill("correct-horse-battery-staple");
   await page.getByRole("button", { name: "Sign in" }).click();
 

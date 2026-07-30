@@ -59,7 +59,7 @@ class EnvironmentConfigurationValidatorTest {
 
     private MockEnvironment validEnvironment() {
         return new MockEnvironment()
-            .withProperty("DB_URL", "jdbc:mysql://localhost:3306/ai_resume_builder")
+            .withProperty("DB_URL", "jdbc:postgresql://localhost:5432/ai_resume_builder")
             .withProperty("DB_PASSWORD", "database-password")
             .withProperty("JWT_SECRET", "01234567890123456789012345678901");
     }

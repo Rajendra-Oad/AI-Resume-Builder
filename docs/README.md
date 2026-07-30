@@ -4,6 +4,13 @@ This folder is the documentation hub for the AI Resume Builder project. The
 numbered guides are the canonical architecture blueprints; the shorter reference
 pages provide quick links for day-to-day development.
 
+## Start Here
+
+For a beginner-friendly explanation of the implemented application, including
+the abstract, architecture, technology stack, folder connections, workflows,
+feature status, unused/optional parts, setup, security, and presentation notes,
+read [Complete Project Documentation](PROJECT_DOCUMENTATION.md).
+
 ## Core Architecture Series
 
 | # | Document | Purpose |
