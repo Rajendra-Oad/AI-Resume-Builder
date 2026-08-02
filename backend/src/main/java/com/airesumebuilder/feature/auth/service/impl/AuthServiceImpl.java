@@ -69,10 +69,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        String identifier=request.identifier().trim();
-        User user = (identifier.contains("@")
-            ? userRepository.findByEmail(identifier.toLowerCase())
-            : userRepository.findByPhoneAndPhoneVerifiedAtIsNotNullAndDeletedAtIsNull(PhoneNumbers.normalize(identifier)))
+        User user = userRepository.findByEmail(request.identifier().trim().toLowerCase())
             .orElseThrow(() -> new AuthenticationException("Invalid email or password."));
 
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(Instant.now())) throw new AuthenticationException("This account is temporarily locked. Try again later.");

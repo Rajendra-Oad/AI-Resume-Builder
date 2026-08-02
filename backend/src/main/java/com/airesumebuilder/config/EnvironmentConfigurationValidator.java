@@ -30,12 +30,12 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         List<String> errors = new ArrayList<>();
         boolean production = environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"));
 
-        require(environment, errors, "DB_URL", "MySQL JDBC URL, for example jdbc:mysql://localhost:3306/ai_resume_builder");
-        require(environment, errors, "DB_PASSWORD", "password for the configured MySQL account");
+        require(environment, errors, "DB_URL", "PostgreSQL JDBC URL, for example jdbc:postgresql://localhost:5432/ai_resume_builder");
+        require(environment, errors, "DB_PASSWORD", "password for the configured PostgreSQL account");
         require(environment, errors, "JWT_SECRET", "random secret containing at least 32 characters");
         String dbUrl = value(environment, "DB_URL");
-        if (present(dbUrl) && !dbUrl.startsWith("jdbc:mysql://")) {
-            errors.add("DB_URL must start with 'jdbc:mysql://'.");
+        if (present(dbUrl) && !dbUrl.startsWith("jdbc:postgresql://")) {
+            errors.add("DB_URL must start with 'jdbc:postgresql://'.");
         }
 
         String jwtSecret = value(environment, "JWT_SECRET");
@@ -54,18 +54,8 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         validateSmtp(environment, errors);
         validateRedis(environment, errors);
         validateDevelopmentSeed(environment, errors);
-        validateOtp(environment, errors, production);
         validateProduction(environment, errors, production);
         return errors;
-    }
-
-    private static void validateOtp(ConfigurableEnvironment environment,List<String> errors,boolean production){
-        String provider=environment.getProperty("OTP_PROVIDER","fake").trim().toLowerCase();
-        if(!Set.of("fake","msg91","android-gateway","textbee").contains(provider)) errors.add("OTP_PROVIDER must be one of: fake, msg91, android-gateway, textbee.");
-        if(production&&!"msg91".equals(provider)) errors.add("OTP_PROVIDER must be msg91 in the prod profile; local OTP providers are development-only.");
-        if("msg91".equals(provider)){require(environment,errors,"MSG91_AUTH_KEY","MSG91 backend authentication key");require(environment,errors,"MSG91_TEMPLATE_ID","DLT-approved MSG91 OTP template ID");}
-        if("android-gateway".equals(provider)){require(environment,errors,"ANDROID_SMS_GATEWAY_URL","Android SMS gateway send endpoint");url(environment,errors,"ANDROID_SMS_GATEWAY_URL",false);}
-        if("textbee".equals(provider)){require(environment,errors,"TEXTBEE_API_KEY","TextBee API key");require(environment,errors,"TEXTBEE_DEVICE_ID","registered TextBee Android device ID");url(environment,errors,"TEXTBEE_BASE_URL",false);}
     }
 
     private static void validateEncryptionKey(ConfigurableEnvironment environment, List<String> errors) {
@@ -112,7 +102,7 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
 
     private static void validateProduction(ConfigurableEnvironment environment, List<String> errors, boolean production) {
         if (!production) return;
-        require(environment, errors, "DB_USERNAME", "least-privileged production MySQL account");
+        require(environment, errors, "DB_USERNAME", "least-privileged production PostgreSQL account");
         require(environment, errors, "APP_FRONTEND_URL", "public HTTPS URL of the production frontend");
         require(environment, errors, "APP_CORS_ALLOWED_ORIGINS", "comma-separated production frontend origins");
         if (!booleanValue(environment, "APP_SECURE_COOKIES", false, errors)) {

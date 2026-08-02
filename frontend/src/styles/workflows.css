@@ -287,9 +287,6 @@
   .profile-photo-editor { align-items:flex-start; }
   .profile-photo-editor { flex-direction:column; }
   .profile-form .form-grid { grid-template-columns:1fr; }
-  .phone-verification { grid-template-columns:1fr; }
-  .phone-verification .status-pill { justify-self:start; }
-  .phone-verification__form { grid-column:1; }
   .typed-section-card,.version-card { align-items:flex-start;flex-direction:column; }
   .section-card-actions { justify-content:flex-start; }
 }

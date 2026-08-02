@@ -30,7 +30,7 @@ public class UserProfileService {
         User user=user(email); UserProfile profile=profiles.findByUserEmailAndUserDeletedAtIsNull(email).orElseGet(()->{UserProfile p=new UserProfile();p.setUser(user);return p;});
         user.setFirstName(request.firstName().trim()); user.setLastName(request.lastName().trim());
         String requestedPhone=blankToNull(request.phone());
-        if(!java.util.Objects.equals(requestedPhone,user.getPhone())){user.setPhone(null);user.setPhoneVerifiedAt(null);}
+        user.setPhone(requestedPhone);
         profile.setDisplayName(blankToNull(request.displayName())); profile.setPhone(blankToNull(request.phone())); profile.setLocation(blankToNull(request.location()));
         users.save(user); return response(user,profiles.save(profile));
     }
@@ -62,7 +62,7 @@ public class UserProfileService {
         profile.setPhotoData(null);profile.setPhotoContentType(null);profile.setPhotoFileName(null);profiles.save(profile);
     }
     private User user(String email){return users.findByEmailAndDeletedAtIsNull(email).orElseThrow(()->new ResourceNotFoundException("User account not found."));}
-    private ProfileResponse response(User u,UserProfile p){return new ProfileResponse(u.getId(),u.getFirstName(),u.getLastName(),u.getEmail(),u.getRole(),p==null?null:p.getDisplayName(),p==null?u.getPhone():p.getPhone(),p==null?null:p.getLocation(),u.getPersona(),u.getCareerGoal(),u.isOnboardingCompleted(),u.getPhoneVerifiedAt()!=null,p!=null&&p.getPhotoData()!=null?"/api/v1/users/me/photo":null);}
+    private ProfileResponse response(User u,UserProfile p){return new ProfileResponse(u.getId(),u.getFirstName(),u.getLastName(),u.getEmail(),u.getRole(),p==null?null:p.getDisplayName(),p==null?u.getPhone():p.getPhone(),p==null?null:p.getLocation(),u.getPersona(),u.getCareerGoal(),u.isOnboardingCompleted(),p!=null&&p.getPhotoData()!=null?"/api/v1/users/me/photo":null);}
     private String blankToNull(String value){return value==null||value.isBlank()?null:value.trim();}
     private String safeFileName(String value){if(value==null||value.isBlank())return "profile-photo";return value.replaceAll("[\\r\\n\\\\/]","_").substring(0,Math.min(255,value.length()));}
     public record ProfileRequest(@NotBlank @Size(max=100) String firstName,@NotBlank @Size(max=100) String lastName,@Size(max=100) String displayName,@Size(max=50) String phone,@Size(max=255) String location){}
@@ -70,6 +70,6 @@ public class UserProfileService {
         @NotBlank @Pattern(regexp="STUDENT|FRESHER|PROFESSIONAL|CAREER_SWITCHER", message="Choose a valid career stage.") String persona,
         @NotBlank @Pattern(regexp="FIRST_RESUME|IMPROVE_RESUME|TAILOR_FOR_JOB|EXPLORE_OPPORTUNITIES", message="Choose a valid career goal.") String careerGoal
     ){}
-    public record ProfileResponse(Long id,String firstName,String lastName,@Email String email,String role,String displayName,String phone,String location,String persona,String careerGoal,boolean onboardingCompleted,boolean phoneVerified,String photoUrl){}
+    public record ProfileResponse(Long id,String firstName,String lastName,@Email String email,String role,String displayName,String phone,String location,String persona,String careerGoal,boolean onboardingCompleted,String photoUrl){}
     public record ProfilePhoto(byte[] content,String contentType,String fileName){}
 }

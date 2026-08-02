@@ -57,17 +57,16 @@ jobs:
   database-integration:
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:8.4
+      postgres:
+        image: postgres:17
         env:
-          MYSQL_DATABASE: ai_resume_builder_test
-          MYSQL_USER: app_test
-          MYSQL_PASSWORD: integration-test-password
-          MYSQL_ROOT_PASSWORD: integration-root-password
+          POSTGRES_DB: ai_resume_builder_test
+          POSTGRES_USER: app_test
+          POSTGRES_PASSWORD: integration-test-password
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uapp_test -pintegration-test-password"
+          --health-cmd="pg_isready -h 127.0.0.1 -U app_test -d ai_resume_builder_test"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -75,7 +74,7 @@ jobs:
       run:
         working-directory: backend
     env:
-      IT_DB_URL: jdbc:mysql://127.0.0.1:3306/ai_resume_builder_test?useSSL=false&allowPublicKeyRetrieval=true
+      IT_DB_URL: jdbc:postgresql://127.0.0.1:5432/ai_resume_builder_test
       IT_DB_USERNAME: app_test
       IT_DB_PASSWORD: integration-test-password
     steps:
@@ -85,7 +84,7 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      - name: Execute and validate Flyway migrations against MySQL
+      - name: Execute and validate Flyway migrations against PostgreSQL
         run: mvn --batch-mode -Pintegration-test verify
 
   frontend-e2e:

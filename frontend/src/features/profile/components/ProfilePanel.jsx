@@ -14,10 +14,8 @@ import {
   deleteProfilePhoto,
   getProfile,
   getProfilePhoto,
-  sendPhoneOtp,
   updateProfile,
   uploadProfilePhoto,
-  verifyPhoneOtp,
 } from "../api/profileApi";
 
 const displayValue = (value) => {
@@ -39,9 +37,6 @@ const ProfileForm = ({ profile }) => {
   const queryClient = useQueryClient();
   const [values, setValues] = useState(() => editableFields(profile));
   const [message, setMessage] = useState("");
-  const [otp, setOtp] = useState("");
-  const [developmentCode, setDevelopmentCode] = useState("");
-  const [resendSeconds, setResendSeconds] = useState(0);
   const photo = useQuery({
     queryKey: ["profile-photo"],
     queryFn: getProfilePhoto,
@@ -71,36 +66,10 @@ const ProfileForm = ({ profile }) => {
       setMessage("Profile photo removed.");
     },
   });
-  useEffect(() => {
-    if (resendSeconds <= 0) return undefined;
-    const timer = window.setTimeout(
-      () => setResendSeconds((seconds) => Math.max(0, seconds - 1)),
-      1000,
-    );
-    return () => window.clearTimeout(timer);
-  }, [resendSeconds]);
   const mutation = useMutation({
     mutationFn: async ({ persona, careerGoal, ...details }) => {
       await updateProfile(details);
       return completeOnboarding({ persona, careerGoal });
-    },
-  });
-  const sendOtp = useMutation({
-    mutationFn: () => sendPhoneOtp(values.phone),
-    onSuccess: (result) => {
-      setDevelopmentCode(result.developmentCode ?? "");
-      setResendSeconds(result.retryAfterSeconds ?? 60);
-      setMessage(`Verification code sent to ${result.destination}.`);
-    },
-  });
-  const verifyOtp = useMutation({
-    mutationFn: () => verifyPhoneOtp(otp),
-    onSuccess: async () => {
-      setOtp("");
-      setDevelopmentCode("");
-      setResendSeconds(0);
-      setMessage("Phone number verified. You can now use it to sign in.");
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
 
@@ -257,77 +226,6 @@ const ProfileForm = ({ profile }) => {
           {mutation.isPending ? "Saving…" : "Save profile"}
         </Button>
       </form>
-      <section className="phone-verification" aria-labelledby="phone-verification-title">
-        <div>
-          <p className="eyebrow">ACCOUNT SECURITY</p>
-          <h2 id="phone-verification-title">Phone verification</h2>
-          <p className="muted">
-            {profile.phoneVerified
-              ? "Verified — this number can be used to sign in."
-              : "Verify your number before using it to sign in."}
-          </p>
-        </div>
-        <span className={`status-pill ${profile.phoneVerified ? "" : "status-pill--warning"}`}>
-          {profile.phoneVerified ? "Verified" : "Not verified"}
-        </span>
-        {!profile.phoneVerified && (
-          <div className="phone-verification__form">
-            {!values.phone.trim() && (
-              <p className="muted">Enter your mobile number above to enable verification.</p>
-            )}
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={!values.phone.trim() || sendOtp.isPending || resendSeconds > 0}
-              onClick={() => sendOtp.mutate()}
-            >
-              {sendOtp.isPending
-                ? "Sending…"
-                : resendSeconds > 0
-                  ? `Resend in ${resendSeconds}s`
-                  : sendOtp.isSuccess
-                    ? "Resend verification code"
-                    : "Send verification code"}
-            </Button>
-            {resendSeconds > 0 && (
-              <p className="muted" role="timer" aria-live="polite">
-                You can request another OTP in {resendSeconds} seconds. The current code remains
-                valid for 5 minutes.
-              </p>
-            )}
-            {(developmentCode || sendOtp.isSuccess) && (
-              <>
-                <FormField id="phoneOtp" label="Six-digit verification code">
-                  <Input
-                    id="phoneOtp"
-                    value={otp}
-                    onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                  />
-                </FormField>
-                <Button
-                  type="button"
-                  disabled={otp.length !== 6 || verifyOtp.isPending}
-                  onClick={() => verifyOtp.mutate()}
-                >
-                  {verifyOtp.isPending ? "Verifying…" : "Verify phone"}
-                </Button>
-              </>
-            )}
-            {developmentCode && (
-              <p className="notice notice--info" role="status">
-                Development code: <strong>{developmentCode}</strong>. No SMS was sent in fake mode.
-              </p>
-            )}
-            {(sendOtp.error || verifyOtp.error) && (
-              <p className="form-error" role="alert">
-                {sendOtp.error?.message || verifyOtp.error?.message}
-              </p>
-            )}
-          </div>
-        )}
-      </section>
       <section className="profile-account-details" aria-labelledby="account-details-title">
         <div className="profile-form__heading">
           <h2 id="account-details-title">Account details</h2>
