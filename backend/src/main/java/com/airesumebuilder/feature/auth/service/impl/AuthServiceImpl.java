@@ -63,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser = userRepository.save(user);
         accountRecoveryService.createVerification(savedUser);
-        return new RegistrationResponse(String.valueOf(savedUser.getId()), savedUser.getEmail(), savedUser.getStatus());
+        return new RegistrationResponse(savedUser.getPublicId().toString(), savedUser.getEmail(), savedUser.getStatus());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override @Transactional(readOnly = true) public AuthResponse refresh(String token) {
         User user = refreshTokenService.validate(token);
-        return new AuthResponse(jwtService.createAccessToken(user), String.valueOf(user.getId()), user.getEmail(), user.getRole(), token);
+        return new AuthResponse(jwtService.createAccessToken(user), user.getPublicId().toString(), user.getEmail(), user.getRole(), token);
     }
     @Override @Transactional public void logout(String token) { refreshTokenService.revoke(token); }
     @Override @Transactional public void changePassword(String email, ChangePasswordRequest request) { User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationException("Invalid account.")); if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) throw new AuthenticationException("Current password is incorrect."); user.setPasswordHash(passwordEncoder.encode(request.newPassword())); refreshTokenService.revokeAll(user.getId()); }
@@ -96,5 +96,5 @@ public class AuthServiceImpl implements AuthService {
             .filter(user -> "PENDING_VERIFICATION".equals(user.getStatus()))
             .ifPresent(accountRecoveryService::createVerification);
     }
-    private AuthResponse response(User user) { return new AuthResponse(jwtService.createAccessToken(user), String.valueOf(user.getId()), user.getEmail(), user.getRole(), refreshTokenService.issue(user)); }
+    private AuthResponse response(User user) { return new AuthResponse(jwtService.createAccessToken(user), user.getPublicId().toString(), user.getEmail(), user.getRole(), refreshTokenService.issue(user)); }
 }

@@ -20,11 +20,14 @@ dist/
 coverage/
 test-results/
 .npm/
+performance/reports/*
+!performance/reports/.gitkeep
 
 # Environment files
 .env
 .env.*
 !.env.example
+!**/.env.production.example
 
 # Logs
 *.log

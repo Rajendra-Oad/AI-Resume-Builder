@@ -13,6 +13,9 @@ const ResumePreviewPage=lazy(()=>import("../../pages/ResumePreviewPage").then((m
 const ResumeVersionsPage=lazy(()=>import("../../pages/ResumeVersionsPage").then((module)=>({default:module.ResumeVersionsPage})));
 const ResumeVersionDetailPage=lazy(()=>import("../../pages/ResumeVersionDetailPage").then((module)=>({default:module.ResumeVersionDetailPage})));
 const ResumeAtsPage=lazy(()=>import("../../pages/ResumeAtsPage").then((module)=>({default:module.ResumeAtsPage})));
+const PdfExportHistoryPage = lazy(() =>
+  import("../../pages/PdfExportHistoryPage").then((module) => ({ default: module.PdfExportHistoryPage })),
+);
 
 export const resumeRoutes = [
   { path: "resumes", element: <ResumesPage /> },
@@ -21,6 +24,7 @@ export const resumeRoutes = [
   { path: "resumes/:resumeId", element: <ResumeEditorPage /> },
   { path: "resumes/:resumeId/edit", element: <ResumeEditorPage /> },
   { path: "resumes/:resumeId/preview", element: <ResumePreviewPage /> },
+  { path: "resumes/:resumeId/exports", element: <PdfExportHistoryPage /> },
   { path: "resumes/:resumeId/ats-check", element: <ResumeAtsPage /> },
   { path: "resumes/:resumeId/versions", element: <ResumeVersionsPage /> },
   { path: "resumes/:resumeId/versions/:versionId", element: <ResumeVersionDetailPage /> },

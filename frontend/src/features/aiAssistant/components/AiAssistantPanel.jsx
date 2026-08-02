@@ -6,6 +6,7 @@ import { ModulePage } from "../../../components/ModulePage";
 import { MetricSkeleton } from "../../../components/Skeleton";
 import { AiProviderSettings } from "../../settings";
 import { getAiUsage } from "../api/aiAssistantApi";
+import { AiJobQueue } from "./AiJobQueue";
 export const AiAssistantPanel = () => {
   const query = useQuery({ queryKey: ["ai-usage"], queryFn: getAiUsage });
   return (
@@ -51,6 +52,7 @@ export const AiAssistantPanel = () => {
           </AsyncState>
         </section>
       </div>
+      <AiJobQueue />
     </ModulePage>
   );
 };

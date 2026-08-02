@@ -37,7 +37,7 @@ class AdminWorkflowIT {
         long targetId = insertUser(jdbc, targetEmail, "USER");
         jdbc.update(
             "INSERT INTO refresh_tokens(user_id,token_hash,expires_at,created_at,revoked) " +
-                "VALUES (?, ?, DATE_ADD(NOW(6), INTERVAL 1 DAY), NOW(6), FALSE)",
+                "VALUES (?, ?, CURRENT_TIMESTAMP + INTERVAL '1 day', CURRENT_TIMESTAMP, FALSE)",
             targetId,
             "refresh-" + suffix
         );
@@ -85,7 +85,7 @@ class AdminWorkflowIT {
     private long insertUser(JdbcTemplate jdbc, String email, String role) {
         jdbc.update(
             "INSERT INTO users(first_name,last_name,email,password_hash,role,status,created_at,updated_at) " +
-                "VALUES ('Integration','User',?,'not-used',?,'ACTIVE',NOW(6),NOW(6))",
+                "VALUES ('Integration','User',?,'not-used',?,'ACTIVE',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)",
             email,
             role
         );

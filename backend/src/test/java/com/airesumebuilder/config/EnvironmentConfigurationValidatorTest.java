@@ -15,8 +15,9 @@ class EnvironmentConfigurationValidatorTest {
 
         assertThatThrownBy(() -> validator.postProcessEnvironment(environment, null))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("3 error(s)")
-            .hasMessageContaining("DB_URL is required")
+            .hasMessageContaining("4 error(s)")
+            .hasMessageContaining("DB_HOST is required")
+            .hasMessageContaining("DB_NAME is required")
             .hasMessageContaining("DB_PASSWORD is required")
             .hasMessageContaining("JWT_SECRET is required")
             .hasMessageNotContaining("super-secret");
@@ -26,6 +27,29 @@ class EnvironmentConfigurationValidatorTest {
     void acceptsCompleteDevelopmentConfiguration() {
         MockEnvironment environment = validEnvironment();
         environment.setActiveProfiles("dev");
+
+        assertThat(EnvironmentConfigurationValidator.validate(environment)).isEmpty();
+    }
+
+    @Test
+    void acceptsRenderManagedPostgresqlConfigurationInProduction() {
+        MockEnvironment environment = new MockEnvironment()
+            .withProperty("DB_HOST", "internal-postgresql.render.internal")
+            .withProperty("DB_PORT", "5432")
+            .withProperty("DB_NAME", "ai_resume_builder")
+            .withProperty("DB_USERNAME", "ai_resume_builder_app")
+            .withProperty("DB_PASSWORD", "database-password")
+            .withProperty("JWT_SECRET", "01234567890123456789012345678901")
+            .withProperty("APP_FRONTEND_URL", "https://resume.example.com")
+            .withProperty("APP_CORS_ALLOWED_ORIGINS", "https://resume.example.com")
+            .withProperty("APP_SECURE_COOKIES", "true")
+            .withProperty("USER_API_KEY_ENCRYPTION_KEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
+            .withProperty("MANAGEMENT_METRICS_TOKEN", "metrics-test-token")
+            .withProperty("GEMINI_API_KEY", "gemini-test-key")
+            .withProperty("SPRING_MAIL_HOST", "smtp.example.com")
+            .withProperty("SPRING_MAIL_USERNAME", "mailer")
+            .withProperty("SPRING_MAIL_PASSWORD", "mail-password");
+        environment.setActiveProfiles("prod");
 
         assertThat(EnvironmentConfigurationValidator.validate(environment)).isEmpty();
     }

@@ -5,18 +5,23 @@ ALTER TABLE resumes
     ADD COLUMN github_url VARCHAR(500) NULL,
     ADD COLUMN linkedin_url VARCHAR(500) NULL,
     ADD COLUMN skills_content TEXT NULL,
-    ADD COLUMN experience_content MEDIUMTEXT NULL,
-    ADD COLUMN projects_content MEDIUMTEXT NULL,
-    ADD COLUMN education_content MEDIUMTEXT NULL,
+    ADD COLUMN experience_content TEXT NULL,
+    ADD COLUMN projects_content TEXT NULL,
+    ADD COLUMN education_content TEXT NULL,
     ADD COLUMN certifications_content TEXT NULL,
     ADD COLUMN languages_content TEXT NULL,
     ADD COLUMN font_family VARCHAR(30) NOT NULL DEFAULT 'HELVETICA',
-    ADD COLUMN font_size DECIMAL(4,1) NOT NULL DEFAULT 10.5,
-    ADD COLUMN line_spacing DECIMAL(3,2) NOT NULL DEFAULT 1.25,
-    ADD COLUMN section_spacing INT NOT NULL DEFAULT 12,
-    ADD COLUMN page_margin INT NOT NULL DEFAULT 42,
-    ADD CONSTRAINT chk_resumes_font_family CHECK (font_family IN ('HELVETICA', 'TIMES', 'COURIER')),
-    ADD CONSTRAINT chk_resumes_font_size CHECK (font_size BETWEEN 9 AND 13),
-    ADD CONSTRAINT chk_resumes_line_spacing CHECK (line_spacing BETWEEN 1 AND 1.8),
-    ADD CONSTRAINT chk_resumes_section_spacing CHECK (section_spacing BETWEEN 6 AND 24),
-    ADD CONSTRAINT chk_resumes_page_margin CHECK (page_margin BETWEEN 24 AND 72);
+    ADD COLUMN font_size NUMERIC(4, 1) NOT NULL DEFAULT 10.5,
+    ADD COLUMN line_spacing NUMERIC(3, 2) NOT NULL DEFAULT 1.25,
+    ADD COLUMN section_spacing INTEGER NOT NULL DEFAULT 12,
+    ADD COLUMN page_margin INTEGER NOT NULL DEFAULT 42,
+    ADD CONSTRAINT chk_resumes_font_family
+        CHECK (font_family IN ('HELVETICA', 'TIMES', 'COURIER')),
+    ADD CONSTRAINT chk_resumes_font_size
+        CHECK (font_size BETWEEN 9 AND 13),
+    ADD CONSTRAINT chk_resumes_line_spacing
+        CHECK (line_spacing BETWEEN 1 AND 1.8),
+    ADD CONSTRAINT chk_resumes_section_spacing
+        CHECK (section_spacing BETWEEN 6 AND 24),
+    ADD CONSTRAINT chk_resumes_page_margin
+        CHECK (page_margin BETWEEN 24 AND 72);

@@ -24,9 +24,8 @@ public class UserProfile {
     @Column(length = 255)
     private String location;
 
-    @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "photo_data", columnDefinition = "MEDIUMBLOB")
+    @Column(name = "photo_data", columnDefinition = "BYTEA")
     private byte[] photoData;
 
     @Column(name = "photo_content_type", length = 100)

@@ -19,7 +19,7 @@ export const AtsWorkspace = ({ initialResumeId = "" }) => {
   const [jobId, setJobId] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
   const resumes = useQuery({ queryKey: ["resumes"], queryFn: listResumes });
-  const jobs = useQuery({ queryKey: ["jobs"], queryFn: listJobs });
+  const jobs = useQuery({ queryKey: ["jobs"], queryFn: () => listJobs() });
   const history = useQuery({ queryKey:["ats-reports",resumeId],queryFn:()=>getResumeReports(Number(resumeId)),enabled:Boolean(resumeId) });
   const analysis = useMutation({ mutationFn: () => analyzeResume(Number(resumeId), Number(jobId)),onSuccess:(value)=>setSelectedReport(value) });
   const reportQuery = useMutation({ mutationFn:getAtsReport,onSuccess:setSelectedReport });

@@ -234,7 +234,7 @@ const ProfileForm = ({ profile }) => {
         <dl className="detail-list">
           <div>
             <dt>Account ID</dt>
-            <dd>{displayValue(profile.id)}</dd>
+            <dd>{displayValue(profile.publicId)}</dd>
           </div>
           <div>
             <dt>Email</dt>
@@ -266,7 +266,7 @@ export const ProfilePanel = () => {
         fallback={<FormSkeleton fields={7} className="profile-card" />}
       >
         {query.data ? (
-          <ProfileForm key={query.data.id ?? query.data.email} profile={query.data} />
+          <ProfileForm key={query.data.publicId ?? query.data.email} profile={query.data} />
         ) : null}
       </AsyncState>
     </ModulePage>

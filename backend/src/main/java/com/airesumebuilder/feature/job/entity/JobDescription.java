@@ -12,8 +12,8 @@ public class JobDescription {
     @Column(length = 255) private String title;
     @Column(name = "company_name", length = 255) private String companyName;
     @Column(name = "source_url", length = 1000) private String sourceUrl;
-    @Lob @Column(nullable = false, columnDefinition = "MEDIUMTEXT") private String content;
-    @Column(name = "extracted_skills", columnDefinition = "json") private String extractedSkills;
+    @Column(nullable = false, columnDefinition = "TEXT") private String content;
+    @Column(name = "extracted_skills", columnDefinition = "jsonb") private String extractedSkills;
     @Column(name = "seniority_level", length = 100) private String seniorityLevel;
     @Column(name = "is_external", nullable = false) private boolean external;
     @Column(name = "deleted_at") private Instant deletedAt;

@@ -37,9 +37,9 @@ public class Resume {
     @Column(name = "github_url") private String githubUrl;
     @Column(name = "linkedin_url") private String linkedinUrl;
     @Column(name = "skills_content", columnDefinition = "TEXT") private String skillsContent;
-    @Column(name = "experience_content", columnDefinition = "MEDIUMTEXT") private String experienceContent;
-    @Column(name = "projects_content", columnDefinition = "MEDIUMTEXT") private String projectsContent;
-    @Column(name = "education_content", columnDefinition = "MEDIUMTEXT") private String educationContent;
+    @Column(name = "experience_content", columnDefinition = "TEXT") private String experienceContent;
+    @Column(name = "projects_content", columnDefinition = "TEXT") private String projectsContent;
+    @Column(name = "education_content", columnDefinition = "TEXT") private String educationContent;
     @Column(name = "certifications_content", columnDefinition = "TEXT") private String certificationsContent;
     @Column(name = "languages_content", columnDefinition = "TEXT") private String languagesContent;
     @Column(name = "font_family", nullable = false) private String fontFamily = "HELVETICA";

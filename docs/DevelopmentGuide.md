@@ -5,7 +5,7 @@ a quick pointer to the commands developers use most often.
 
 ## Local Setup Checklist
 
-1. Install Java 21, Node.js 20+, npm, Git, and MySQL 8.
+1. Install Java 21, Node.js 20+, npm, Git, and PostgreSQL.
 2. Run the setup script for your platform from the repository root.
 3. Fill `backend/.env` with local database, JWT, and optional AI settings.
 4. Start the backend and frontend in separate terminals.

@@ -1,5 +1,7 @@
 import { Component } from "react";
 
+import { captureFrontendError } from "../observability";
+
 export class ErrorBoundary extends Component {
   state = { hasError: false };
 
@@ -8,6 +10,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    captureFrontendError(error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 

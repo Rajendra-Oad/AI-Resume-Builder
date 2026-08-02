@@ -28,7 +28,8 @@ public class AiUserSettingsRepository {
     public void saveSettings(Long userId, String mode, String provider, boolean fallback) {
         jdbc.update(
             "INSERT INTO user_ai_settings (user_id,mode,preferred_provider,allow_platform_fallback,updated_at) VALUES (?,?,?,?,?) " +
-                "ON DUPLICATE KEY UPDATE mode=VALUES(mode),preferred_provider=VALUES(preferred_provider),allow_platform_fallback=VALUES(allow_platform_fallback),updated_at=VALUES(updated_at)",
+                "ON CONFLICT (user_id) DO UPDATE SET mode=EXCLUDED.mode,preferred_provider=EXCLUDED.preferred_provider," +
+                "allow_platform_fallback=EXCLUDED.allow_platform_fallback,updated_at=EXCLUDED.updated_at",
             userId, mode, provider, fallback, Instant.now()
         );
     }
@@ -46,7 +47,9 @@ public class AiUserSettingsRepository {
         Instant now = Instant.now();
         jdbc.update(
             "INSERT INTO user_ai_provider_credentials (user_id,provider,encrypted_key,initialization_vector,key_version,key_hint,created_at,updated_at) VALUES (?,?,?,?,1,?,?,?) " +
-                "ON DUPLICATE KEY UPDATE encrypted_key=VALUES(encrypted_key),initialization_vector=VALUES(initialization_vector),key_version=VALUES(key_version),key_hint=VALUES(key_hint),updated_at=VALUES(updated_at)",
+                "ON CONFLICT (user_id,provider) DO UPDATE SET encrypted_key=EXCLUDED.encrypted_key," +
+                "initialization_vector=EXCLUDED.initialization_vector,key_version=EXCLUDED.key_version," +
+                "key_hint=EXCLUDED.key_hint,updated_at=EXCLUDED.updated_at",
             userId, provider, encrypted, iv, hint, now, now
         );
     }

@@ -64,6 +64,7 @@ class AuthServiceImplTest {
         assertEquals("encoded-password", savedUser.getPasswordHash());
         assertEquals("PENDING_VERIFICATION", savedUser.getStatus());
         assertEquals(null, savedUser.getVerifiedAt());
+        assertEquals(savedUser.getPublicId().toString(), response.userId());
         assertEquals("test@example.com", response.email());
         verify(accountRecoveryService).createVerification(savedUser);
     }

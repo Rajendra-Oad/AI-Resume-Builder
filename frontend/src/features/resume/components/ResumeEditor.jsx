@@ -14,7 +14,7 @@ import { Textarea } from "../../../components/Textarea";
 import { UnsavedChangesDialog } from "../../../components/UnsavedChangesDialog";
 import { useUndoRedoState } from "../../../hooks/useUndoRedoState";
 import { validateResume } from "../../../validators/resumeValidator";
-import { generateResumeSummary } from "../../ai/api/aiApi";
+import { useAiJobRunner } from "../../aiAssistant/hooks/useAiJob";
 import { getProfile } from "../../profile/api/profileApi";
 import { applyTemplate, listTemplates } from "../../templates/api/templateApi";
 import {
@@ -70,7 +70,7 @@ export const ResumeEditor = ({ resumeId }) => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(() => location.state?.notice ?? "");
   const [loaded, setLoaded] = useState(isNew);
-  const [generating, setGenerating] = useState(false);
+  const summaryGeneration = useAiJobRunner("resume-summary", "Resume summary");
   const [downloading, setDownloading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [historyMessage, setHistoryMessage] = useState("");
@@ -162,20 +162,23 @@ export const ResumeEditor = ({ resumeId }) => {
       setErrors((current) => ({ ...current, summary: "Add your experience facts before using AI." }));
       return;
     }
-    setGenerating(true);
     setMessage("");
     try {
-      const result = await generateResumeSummary(
+      await summaryGeneration.submit(
         `Target role: ${values.targetJobTitle || values.title}\nCandidate facts: ${values.summary}`,
       );
-      setValues((current) => ({ ...current, summary: result.content }));
-      setMessage("AI draft ready. Review every fact before saving.");
     } catch (error) {
       setMessage(error.message);
-    } finally {
-      setGenerating(false);
     }
   };
+  useEffect(() => {
+    if (summaryGeneration.job?.status === "SUCCEEDED") {
+      setValues((current) => ({ ...current, summary: summaryGeneration.job.content || current.summary }));
+      setMessage("AI draft ready. Review every fact before saving.");
+    } else if (summaryGeneration.job?.status === "FAILED") {
+      setMessage(summaryGeneration.job.error || "The AI request failed.");
+    }
+  }, [setValues, summaryGeneration.job]);
   improveRef.current = improveWithAi;
 
   const submit = async (event) => {
@@ -239,7 +242,7 @@ export const ResumeEditor = ({ resumeId }) => {
     if (["personal", "links"].includes(sectionId)) setCurrentStep(0);
     else if (sectionId === "summary") setCurrentStep(1);
     else setCurrentStep(2);
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    formRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
   };
 
   return (
@@ -279,7 +282,7 @@ export const ResumeEditor = ({ resumeId }) => {
               </div>}
               {currentStep === 1 && <>
                 <FormField id="summary" label="Career objective / professional summary" error={errors.summary}><Textarea id="summary" name="summary" rows="9" value={values.summary} onChange={update} /></FormField>
-                <Button type="button" variant="secondary" onClick={improveWithAi} disabled={generating}>{!generating && <AppIcon name="ai" size={18} />}{generating ? "Creating AI draft…" : "Improve with AI"}</Button>
+                <Button type="button" variant="secondary" onClick={improveWithAi} disabled={summaryGeneration.isRunning}>{!summaryGeneration.isRunning && <AppIcon name="ai" size={18} />}{summaryGeneration.isRunning ? "Creating AI draft…" : "Improve with AI"}</Button>
               </>}
               {currentStep === 2 && <div className="resume-section-fields">
                 {!isNew && <TypedSectionsEditor resumeId={resumeId} onSections={(items)=>queryClient.setQueryData(["resume-sections",resumeId],items)}/>}

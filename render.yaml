@@ -1,0 +1,67 @@
+services:
+  - type: web
+    name: ai-resume-builder-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health/readiness
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: password
+      - key: DB_SSL_MODE
+        value: require
+      - key: APP_SECURE_COOKIES
+        value: "true"
+      - key: APP_FRONTEND_URL
+        sync: false
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: USER_API_KEY_ENCRYPTION_KEY
+        sync: false
+      - key: MANAGEMENT_METRICS_TOKEN
+        sync: false
+      - key: SPRING_MAIL_HOST
+        sync: false
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+databases:
+  - name: ai-resume-builder-db
+    databaseName: ai_resume_builder
+    user: ai_resume_builder_app
+    ipAllowList: []

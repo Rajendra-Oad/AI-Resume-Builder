@@ -16,11 +16,12 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:uat": "playwright test e2e/uat",
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@sentry/react": "10.69.0",
     "@tanstack/react-query": "5.101.2",
-    "@untitledui/icons": "0.0.22",
     "axios": "^1.7.0",
     "gsap": "3.15.0",
     "locomotive-scroll": "5.0.1",
@@ -32,6 +33,7 @@
     "react-router-dom": "npm:react-router@8.3.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@playwright/test": "1.61.1",
     "@tailwindcss/vite": "^4.1.0",
     "@testing-library/jest-dom": "^6.6.3",

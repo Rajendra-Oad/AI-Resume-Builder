@@ -1,0 +1,23 @@
+# Target and authorization. Remote targets are blocked unless explicitly approved.
+BASE_URL=http://localhost:8080
+ALLOW_PRODUCTION=false
+
+# Prefer a pool of synthetic, verified accounts for medium/high load.
+# PERF_USERS_JSON=[{"email":"perf-001@example.test","password":"..."}]
+PERF_USER_EMAIL=
+PERF_USER_PASSWORD=
+
+LOAD_PROFILE=smoke
+ALLOW_WRITES=false
+ALLOW_AI=false
+ALLOW_ATS=false
+ALLOW_PDF=false
+THINK_TIME_SECONDS=1
+
+# Provisional gates; calibrate from an approved baseline.
+API_P95_MS=1000
+API_P99_MS=2000
+HEAVY_P95_MS=15000
+HEAVY_P99_MS=30000
+MAX_ERROR_RATE=0.01
+MIN_CHECK_RATE=0.99

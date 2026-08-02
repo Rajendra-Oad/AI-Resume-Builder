@@ -21,6 +21,9 @@ export const ResumePreviewPage = () => {
       description="Review the document without editor controls before exporting."
     >
       <div className="preview-page-actions">
+        <Link to={`/resumes/${resumeId}/exports`}>
+          <Button variant="ghost">Export history</Button>
+        </Link>
         <Link to={`/resumes/${resumeId}/edit`}>
           <Button variant="ghost">Back to editor</Button>
         </Link>

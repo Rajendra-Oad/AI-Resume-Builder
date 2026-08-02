@@ -34,7 +34,7 @@ public class AdminRepository {
 
     public UserView update(String adminEmail, long id, String field, String value, String action) {
         String column = field.equals("role") ? "role" : "status";
-        if (jdbc.update("UPDATE users SET " + column + "=?,updated_at=NOW(6) WHERE id=? AND deleted_at IS NULL", value, id) == 0) {
+        if (jdbc.update("UPDATE users SET " + column + "=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND deleted_at IS NULL", value, id) == 0) {
             throw new ResourceNotFoundException("User not found.");
         }
         if (column.equals("status") && !value.equals("ACTIVE")) {
@@ -42,7 +42,7 @@ public class AdminRepository {
         }
         jdbc.update(
             "INSERT INTO admin_action_logs(admin_user_id,target_user_id,action,details,created_at) " +
-                "SELECT id,?,?,JSON_OBJECT(?,?),NOW(6) FROM users WHERE email=? AND deleted_at IS NULL",
+                "SELECT id,?,?,jsonb_build_object(CAST(? AS TEXT),?),CURRENT_TIMESTAMP FROM users WHERE email=? AND deleted_at IS NULL",
             id,
             action,
             column,

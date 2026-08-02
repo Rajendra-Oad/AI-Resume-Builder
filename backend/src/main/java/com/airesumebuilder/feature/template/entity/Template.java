@@ -16,7 +16,7 @@ public class Template {
     @Column(name = "preview_url", length = 500) private String previewUrl;
     @Column(name = "is_system", nullable = false) private boolean system = true;
     @Column(name = "is_active", nullable = false) private boolean active = true;
-    @Column(columnDefinition = "json") private String configuration;
+    @Column(columnDefinition = "jsonb") private String configuration;
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt;
     @Column(name = "updated_at") private Instant updatedAt;
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
@@ -6,23 +6,30 @@ import { FormField } from "../../../components/FormField";
 import { ModulePage } from "../../../components/ModulePage";
 import { AiJobSkeleton } from "../../../components/Skeleton";
 import { Textarea } from "../../../components/Textarea";
-import { generateContent } from "../../aiAssistant/api/aiAssistantApi";
+import { useAiJobRunner } from "../../aiAssistant/hooks/useAiJob";
 export const CoverLetterWorkspace = () => {
   const [facts, setFacts] = useState("");
   const [result, setResult] = useState("");
   const [state, setState] = useState({ loading: false, error: "" });
+  const generation = useAiJobRunner("cover-letter", "Cover-letter draft");
+  useEffect(() => {
+    if (generation.job?.status === "SUCCEEDED") {
+      setResult(generation.job.content || "");
+      setState({ loading: false, error: "" });
+    } else if (generation.job?.status === "FAILED") {
+      setState({ loading: false, error: generation.job.error || "The AI request failed." });
+    }
+  }, [generation.job]);
   const generate = async (event) => {
     event.preventDefault();
     if (!facts.trim()) return;
     setState({ loading: true, error: "" });
     try {
-      const response = await generateContent("cover-letter", facts);
-      setResult(response.content);
+      await generation.submit(facts);
     } catch (error) {
       setState({ loading: false, error: error.message });
       return;
     }
-    setState({ loading: false, error: "" });
   };
   return (
     <ModulePage
@@ -51,14 +58,14 @@ export const CoverLetterWorkspace = () => {
                 {state.error}
               </p>
             )}
-            <Button disabled={state.loading}>
+            <Button disabled={state.loading || generation.isRunning}>
               {state.loading ? "Generating…" : "Generate draft"}
             </Button>
           </form>
         </Card>
         <Card>
           <h2>Draft</h2>
-          {state.loading ? <AiJobSkeleton title="Writing your cover letter" steps={["Reviewing your facts", "Shaping your story", "Polishing the draft"]} /> : <p className="cover-output" aria-live="polite">{result || "Your generated draft will appear here."}</p>}
+          {(state.loading || generation.isRunning) ? <AiJobSkeleton title="Writing your cover letter" steps={["Queued securely", "Reviewing your facts", "Polishing the draft"]} /> : <p className="cover-output" aria-live="polite">{result || "Your generated draft will appear here."}</p>}
         </Card>
       </div>
     </ModulePage>

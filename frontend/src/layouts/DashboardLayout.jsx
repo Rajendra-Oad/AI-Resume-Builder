@@ -19,6 +19,8 @@ const navigation = [
 
 const utilityNavigation = [
   ["Profile", "/profile", "profile"],
+  ["Activity", "/activity", "activity"],
+  ["Billing", "/billing", "billing"],
   ["Settings", "/settings", "settings"],
 ];
 

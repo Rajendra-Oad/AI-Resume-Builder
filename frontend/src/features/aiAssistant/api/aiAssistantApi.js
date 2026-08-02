@@ -5,3 +5,7 @@ export const generateContent = (workflow, input) =>
     .then((response) => response.data.data);
 export const getAiUsage = () =>
   apiClient.get("/api/v1/ai/usage").then((response) => response.data.data);
+export const submitAiJob = ({ workflow, input, locale = "en-US" }) =>
+  apiClient.post("/api/v1/ai/jobs", { workflow, input, locale }).then((response) => response.data.data);
+export const getAiJob = (id) =>
+  apiClient.get(`/api/v1/ai/jobs/${id}`).then((response) => response.data.data);

@@ -15,7 +15,7 @@ vi.mock("../api/profileApi", () => ({
 }));
 
 const profile = {
-  id: 7,
+  publicId: "d7cc4df2-afd5-45c8-9f4b-78d718442fb7",
   firstName: "Asha",
   lastName: "Rao",
   email: "asha@example.com",
@@ -48,6 +48,7 @@ describe("ProfilePanel", () => {
     expect(await screen.findByLabelText("First name")).toHaveValue("Asha");
     expect(screen.getByLabelText("Last name")).toHaveValue("Rao");
     expect(screen.getByText("asha@example.com")).toBeInTheDocument();
+    expect(screen.getByText(profile.publicId)).toBeInTheDocument();
     expect(screen.getByDisplayValue("Bengaluru")).toBeInTheDocument();
   });
 

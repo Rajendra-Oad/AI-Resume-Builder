@@ -26,7 +26,7 @@ public class SecurityEmailService {
     public void sendActionEmail(String to, String subject, String heading, String introduction, String actionLabel, String actionUrl, String expiry) {
         JavaMailSender sender = mailSender.getIfAvailable();
         if (sender == null) {
-            log.warn("Security email for {} was not sent because SMTP is not configured.", to);
+            log.warn("Security email was not sent because SMTP is not configured.");
             return;
         }
         try {
@@ -38,7 +38,7 @@ public class SecurityEmailService {
             helper.setText(plainText(introduction, actionLabel, actionUrl, expiry), html(heading, introduction, actionLabel, actionUrl, expiry));
             sender.send(message);
         } catch (Exception exception) {
-            log.error("Unable to send security email to {}. Check SMTP configuration and provider response.", to, exception);
+            log.error("Unable to send security email. Check SMTP configuration and provider response.", exception);
             throw new IllegalStateException("Unable to send security email.", exception);
         }
     }

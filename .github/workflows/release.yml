@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: ai_resume_builder_test
+          POSTGRES_USER: app_test
+          POSTGRES_PASSWORD: integration-test-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -h 127.0.0.1 -U app_test -d ai_resume_builder_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate semantic version tag
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must use semantic versioning, for example v1.2.3 or v1.2.3-rc.1" >&2
+            exit 1
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Verify and package backend
+        working-directory: backend
+        run: mvn --batch-mode verify
+      - name: Verify PostgreSQL migrations and workflows
+        working-directory: backend
+        env:
+          IT_DB_URL: jdbc:postgresql://127.0.0.1:5432/ai_resume_builder_test
+          IT_DB_USERNAME: app_test
+          IT_DB_PASSWORD: integration-test-password
+        run: mvn --batch-mode -Pintegration-test verify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.0"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Verify and package frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm test -- --run
+          npm run build
+          tar -czf ../frontend-dist.tgz -C dist .
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          backend/target/ai-resume-builder-backend-*.jar
+          frontend-dist.tgz
+          --verify-tag
+          --generate-notes
+          --title "$GITHUB_REF_NAME"

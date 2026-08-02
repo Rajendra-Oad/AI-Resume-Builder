@@ -60,7 +60,8 @@ public class AiUsageRepository {
 
     public BigDecimal spentThisMonth(Long userId) {
         BigDecimal spent = jdbc.queryForObject(
-            "SELECT COALESCE(SUM(cost_estimate),0) FROM ai_usage_ledger WHERE user_id=? AND created_at >= DATE_FORMAT(UTC_TIMESTAMP(), '%Y-%m-01')",
+            "SELECT COALESCE(SUM(cost_estimate),0) FROM ai_usage_ledger WHERE user_id=? " +
+                "AND created_at >= (date_trunc('month', CURRENT_TIMESTAMP AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')",
             BigDecimal.class,
             userId
         );

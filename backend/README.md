@@ -2,24 +2,24 @@
 
 ## Run the existing build
 
-This repository does not include the Maven Wrapper. A packaged application is
-available after a build, so run it with:
+This repository includes the Maven Wrapper (`mvnw` / `mvnw.cmd`). A packaged
+application is available after a build, so run it with:
 
 ```powershell
 cd backend
 java -jar .\target\ai-resume-builder-backend-0.1.0.jar
 ```
 
-To rebuild after source changes, install Apache Maven and run:
+To rebuild after source changes, use the Maven Wrapper:
 
 ```powershell
-mvn spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
 The API server runs on http://localhost:8080.
 
 Before starting, create `backend/.env` from `.env.example` and set your local
-MySQL credentials. The `.env` file is ignored by Git and loaded locally by
+PostgreSQL credentials. The `.env` file is ignored by Git and loaded locally by
 Spring Boot; never add real credentials to `application.properties`.
 
 For a frontend opened from another device on the same Wi-Fi, add its Vite URL

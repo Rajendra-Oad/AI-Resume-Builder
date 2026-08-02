@@ -30,7 +30,7 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         List<String> errors = new ArrayList<>();
         boolean production = environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"));
 
-        require(environment, errors, "DB_URL", "PostgreSQL JDBC URL, for example jdbc:postgresql://localhost:5432/ai_resume_builder");
+        validateDatabaseLocation(environment, errors);
         require(environment, errors, "DB_PASSWORD", "password for the configured PostgreSQL account");
         require(environment, errors, "JWT_SECRET", "random secret containing at least 32 characters");
         String dbUrl = value(environment, "DB_URL");
@@ -105,9 +105,24 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         require(environment, errors, "DB_USERNAME", "least-privileged production PostgreSQL account");
         require(environment, errors, "APP_FRONTEND_URL", "public HTTPS URL of the production frontend");
         require(environment, errors, "APP_CORS_ALLOWED_ORIGINS", "comma-separated production frontend origins");
+        require(environment, errors, "USER_API_KEY_ENCRYPTION_KEY", "Base64-encoded 32-byte key for encrypted user provider credentials");
+        require(environment, errors, "MANAGEMENT_METRICS_TOKEN", "random token protecting the Prometheus metrics endpoint");
+        require(environment, errors, "SPRING_MAIL_HOST", "SMTP host required for account verification and recovery");
+        require(environment, errors, "SPRING_MAIL_USERNAME", "SMTP username required for account verification and recovery");
+        require(environment, errors, "SPRING_MAIL_PASSWORD", "SMTP password required for account verification and recovery");
+        String provider = environment.getProperty("AI_PROVIDER", "gemini").trim().toLowerCase();
+        if ("gemini".equals(provider)) require(environment, errors, "GEMINI_API_KEY", "platform Gemini provider credential");
+        if ("openai".equals(provider)) require(environment, errors, "OPENAI_API_KEY", "platform OpenAI provider credential");
         if (!booleanValue(environment, "APP_SECURE_COOKIES", false, errors)) {
             errors.add("APP_SECURE_COOKIES must be true in the prod profile.");
         }
+    }
+
+    private static void validateDatabaseLocation(ConfigurableEnvironment environment, List<String> errors) {
+        if (present(value(environment, "DB_URL"))) return;
+        require(environment, errors, "DB_HOST", "PostgreSQL hostname when DB_URL is not supplied");
+        require(environment, errors, "DB_NAME", "PostgreSQL database name when DB_URL is not supplied");
+        port(environment, errors, "DB_PORT", "5432");
     }
 
     private static void require(ConfigurableEnvironment environment, List<String> errors, String name, String purpose) {

@@ -86,7 +86,8 @@ public class DevDataSeeder implements ApplicationRunner {
         jdbc.update("""
             INSERT INTO user_profiles (user_id, display_name, phone, location, created_at, updated_at)
             VALUES (?, 'Demo Candidate', '+1 555 0100', 'Remote', ?, ?)
-            ON DUPLICATE KEY UPDATE display_name=VALUES(display_name), phone=VALUES(phone), location=VALUES(location), updated_at=VALUES(updated_at)
+            ON CONFLICT (user_id) DO UPDATE SET display_name=EXCLUDED.display_name, phone=EXCLUDED.phone,
+                location=EXCLUDED.location, updated_at=EXCLUDED.updated_at
             """, demo.getId(), Instant.now(), Instant.now());
     }
 
@@ -100,7 +101,7 @@ public class DevDataSeeder implements ApplicationRunner {
         jdbc.update("""
             INSERT INTO templates (name, description, is_system, is_active, created_at)
             VALUES (?, ?, TRUE, TRUE, ?)
-            ON DUPLICATE KEY UPDATE description=VALUES(description), is_active=TRUE
+            ON CONFLICT (name) DO UPDATE SET description=EXCLUDED.description, is_active=TRUE
             """, name, description, Instant.now());
     }
 
@@ -113,7 +114,8 @@ public class DevDataSeeder implements ApplicationRunner {
         jdbc.update("""
             INSERT INTO ai_prompt_templates (workflow, version, locale, status, system_instruction, category, created_at, published_at)
             VALUES (?, 1, 'en-US', 'PUBLISHED', ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE system_instruction=VALUES(system_instruction), category=VALUES(category), status='PUBLISHED', published_at=VALUES(published_at)
+            ON CONFLICT (workflow, version, locale) DO UPDATE SET system_instruction=EXCLUDED.system_instruction,
+                category=EXCLUDED.category, status='PUBLISHED', published_at=EXCLUDED.published_at
             """, workflow, instruction, category, Instant.now(), Instant.now());
     }
 
@@ -137,7 +139,7 @@ public class DevDataSeeder implements ApplicationRunner {
             INSERT INTO job_descriptions (user_id, title, company_name, source_url, content, extracted_skills, seniority_level, is_external, created_at, updated_at)
             SELECT ?, 'Senior Software Engineer', 'Example Labs', 'seed://job/senior-software-engineer',
                    'Build secure Java services and accessible React applications. Required skills: Java, Spring Boot, React, MySQL, API design.',
-                   JSON_ARRAY('Java','Spring Boot','React','MySQL','REST'), 'SENIOR', FALSE, ?, ?
+                   CAST('["Java","Spring Boot","React","MySQL","REST"]' AS JSONB), 'SENIOR', FALSE, ?, ?
             WHERE NOT EXISTS (SELECT 1 FROM job_descriptions WHERE source_url='seed://job/senior-software-engineer')
             """, userId, Instant.now(), Instant.now());
         return jdbc.queryForObject("SELECT id FROM job_descriptions WHERE source_url='seed://job/senior-software-engineer' ORDER BY id LIMIT 1", Long.class);
@@ -174,8 +176,9 @@ public class DevDataSeeder implements ApplicationRunner {
             """, reportId, reportId);
         jdbc.update("""
             INSERT INTO job_matches (resume_id, job_description_id, match_score, computed_at, expires_at)
-            VALUES (?, ?, 82.00, ?, DATE_ADD(?, INTERVAL 7 DAY))
-            ON DUPLICATE KEY UPDATE match_score=VALUES(match_score), computed_at=VALUES(computed_at), expires_at=VALUES(expires_at)
+            VALUES (?, ?, 82.00, ?, CAST(? AS TIMESTAMPTZ) + INTERVAL '7 days')
+            ON CONFLICT (resume_id, job_description_id) DO UPDATE SET match_score=EXCLUDED.match_score,
+                computed_at=EXCLUDED.computed_at, expires_at=EXCLUDED.expires_at
             """, resumeId, jobId, Instant.now(), Instant.now());
     }
 
@@ -199,15 +202,14 @@ public class DevDataSeeder implements ApplicationRunner {
         Long providerId = jdbc.queryForObject("SELECT id FROM ai_providers WHERE provider_key='gemini'", Long.class);
         Integer existing = jdbc.queryForObject("SELECT COUNT(*) FROM ai_requests WHERE user_id=? AND prompt_reference='dev-seed:usage'", Integer.class, userId);
         if (existing != null && existing > 0) return;
-        jdbc.update("INSERT INTO ai_requests (user_id,provider_id,credential_source,request_type,status,prompt_reference,created_at,completed_at) VALUES (?,?, 'PLATFORM','resume-summary','SUCCEEDED','dev-seed:usage',?,?)", userId, providerId, Instant.now(), Instant.now());
-        Long requestId = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        Long requestId = jdbc.queryForObject("INSERT INTO ai_requests (user_id,provider_id,credential_source,request_type,status,prompt_reference,created_at,completed_at) VALUES (?,?, 'PLATFORM','resume-summary','SUCCEEDED','dev-seed:usage',?,?) RETURNING id", Long.class, userId, providerId, Instant.now(), Instant.now());
         jdbc.update("INSERT INTO ai_usage_ledger (user_id,provider_id,ai_request_id,input_tokens,output_tokens,cost_estimate,billing_period_reference,created_at) VALUES (?,?,?,?,?,?,?,?)", userId, providerId, requestId, 320, 110, new BigDecimal("0.000076"), "DEV-SEED", Instant.now());
     }
 
     private void seedAudit(Long userId, Long resumeId) {
         jdbc.update("""
             INSERT INTO audit_logs (user_id, entity_type, entity_id, action, after_state, created_at)
-            SELECT ?, 'Resume', ?, 'DEV_SEED_CREATED', JSON_OBJECT('seed', TRUE), ?
+            SELECT ?, 'Resume', ?, 'DEV_SEED_CREATED', jsonb_build_object('seed', TRUE), ?
             WHERE NOT EXISTS (SELECT 1 FROM audit_logs WHERE user_id=? AND entity_type='Resume' AND entity_id=? AND action='DEV_SEED_CREATED')
             """, userId, resumeId, Instant.now(), userId, resumeId);
     }

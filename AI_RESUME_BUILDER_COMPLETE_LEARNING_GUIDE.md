@@ -992,16 +992,13 @@ docs/12_Global_Loading_Experience_Architecture.md
 docs/13_Global_UI_Theme_Consistency.md
 docs/AI_Provider_Choice_BYOK.md
 docs/API.md
-docs/Architecture.md
 docs/CodingStandards.md
 docs/Contributing.md
 docs/Critical_Frontend_Audit.md
-docs/Database.md
 docs/Deployment.md
 docs/DevelopmentGuide.md
 docs/Frontend_Architecture_Implementation_Audit.md
 docs/PHONE_OTP_SETUP.md
-docs/PROJECT_DOCUMENTATION.md
 docs/README.md
 docs/Roadmap.md
 docs/SecurityNotes.md

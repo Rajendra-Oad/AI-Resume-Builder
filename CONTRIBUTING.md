@@ -26,7 +26,7 @@ Examples:
 ```text
 feat(resume): add PDF preview
 fix(auth): preserve session after browser refresh
-ci!: require MySQL migration verification
+ci!: require PostgreSQL migration verification
 ```
 
 The `Conventional commits` GitHub Actions check validates every non-merge commit and the

@@ -1,30 +1,18 @@
-# Production Docker deployment
+# Docker support
 
-The production Compose stack contains only:
+The production target is Render for the Spring Boot backend and PostgreSQL, plus Vercel for the frontend. Use the root `render.yaml` and `vercel.json` for production.
 
-- Spring Boot backend
-- Unprivileged Nginx HTTPS reverse proxy
+`backend/Dockerfile` is the authoritative backend image and is used directly by Render. It is multi-stage, runs Java 21 as a non-root user, contains no environment files, and exposes the Actuator health check.
 
-MySQL remains the existing EC2 host service. The Vercel frontend is not rebuilt
-or served from this stack.
+The files under `docker/` remain an optional self-hosted HTTPS topology. They assume an externally managed PostgreSQL service reachable through `DB_URL`; they do not provision a database and must not be used with MySQL configuration.
 
-From the repository root:
+Before using the optional Compose stack:
 
 ```bash
 cp docker/.env.example docker/.env
-# Set the existing host TLS certificate paths in docker/.env.
-
 docker compose -f docker/docker-compose.yml config --quiet
 docker compose -f docker/docker-compose.yml build backend
-docker compose -f docker/docker-compose.yml up -d backend
-docker compose -f docker/docker-compose.yml logs -f backend
+docker compose -f docker/docker-compose.yml up -d
 ```
 
-After the backend is healthy and host ports 80/443 are available:
-
-```bash
-docker compose -f docker/docker-compose.yml up -d nginx
-```
-
-See [the complete EC2 runbook](../docs/Deployment.md) before performing the
-host-Nginx cutover or the first Flyway migration.
+Set PostgreSQL, JWT, encryption, SMTP, AI, frontend URL, CORS and TLS values in ignored environment files or the deployment secret manager. See [`docs/Deployment.md`](../docs/Deployment.md) for the production Render/Vercel runbook.

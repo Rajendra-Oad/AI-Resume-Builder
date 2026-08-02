@@ -1,6 +1,6 @@
 # AI Resume Builder — Architecture as Implemented
 
-This document describes the repository as it exists in code. It is not a target architecture. It was audited against `backend/pom.xml`, `frontend/package.json`/`package-lock.json`, Java source, React source, application configuration, and all Flyway migrations through `V15`.
+This document describes the repository as it exists in code. It is not a target architecture. It was audited against `backend/pom.xml`, `frontend/package.json`/`package-lock.json`, Java source, React source, application configuration, and all Flyway migrations through `V16`.
 
 ## 1. Tech stack (actual versions)
 
@@ -12,7 +12,7 @@ This document describes the repository as it exists in code. It is not a target 
 - Spring Framework overridden to 6.2.19; Spring Security overridden to 6.5.11; embedded Tomcat overridden to 10.1.57.
 - Spring Boot starters: Web/MVC, Security, Data JPA, Bean Validation, Actuator, Mail, and Data Redis.
 - Hibernate/JPA and Lombok are managed by the Spring Boot BOM.
-- MySQL Connector/J (runtime, Boot-managed) and Flyway MySQL (Boot-managed). Hibernate schema generation is disabled (`ddl-auto=none`); Flyway owns schema changes.
+- PostgreSQL JDBC driver (runtime, Boot-managed) and Flyway PostgreSQL (Boot-managed). Hibernate schema generation is disabled (`ddl-auto=none`); Flyway owns schema changes.
 - JJWT 0.12.6 (`jjwt-api`, runtime `jjwt-impl`, runtime `jjwt-jackson`).
 - springdoc OpenAPI WebMVC UI 2.8.16.
 - OpenPDF 3.0.4.
@@ -33,7 +33,7 @@ This document describes the repository as it exists in code. It is not a target 
 
 ### Runtime/infrastructure
 
-- MySQL is the primary database.
+- PostgreSQL is the primary database.
 - Redis is optional and disabled by default; it backs the AI rate limiter when enabled. A non-Redis implementation is also present.
 - SMTP is used for verification and recovery email.
 - AI calls use direct HTTP adapters for Gemini or OpenAI; the configured default is Gemini.
@@ -119,12 +119,12 @@ Frontend structure is also feature-first, but route-level components are split i
 
 ## 3. Database schema (as built)
 
-All migrations target MySQL. IDs are generally auto-increment `BIGINT`; timestamps use `DATETIME(6)`. The list below gives every JPA entity and mapped fields, followed by migration-only tables.
+All migrations target PostgreSQL. IDs are generally `BIGINT` identity columns; timestamps use `TIMESTAMPTZ`. The list below gives every JPA entity and mapped fields, followed by migration-only tables.
 
 ### Identity and authentication
 
 - `users` (`User`): `id`, `first_name`, `last_name`, unique `email`, `phone`, `password_hash`, `role`, `status`, `persona`, `career_goal`, `onboarding_completed`, `failed_login_attempts`, `locked_until`, `verified_at`, `phone_verified_at`, `last_login_at`, `created_at`, `updated_at`, `deleted_at`. Other entities point to it; the entity itself does not declare inverse collections.
-- `user_profiles` (`UserProfile`): `id`, unique `user_id`, `display_name`, `phone`, `location`, lazy `photo_data` MEDIUMBLOB, `photo_content_type`, `photo_file_name`, `created_at`, `updated_at`. One-to-one, owning side, to `User`.
+- `user_profiles` (`UserProfile`): `id`, unique `user_id`, `display_name`, `phone`, `location`, lazy `photo_data` BYTEA, `photo_content_type`, `photo_file_name`, `created_at`, `updated_at`. One-to-one, owning side, to `User`.
 - `refresh_tokens` (`RefreshToken`): `id`, `user_id`, unique `token_hash`, `expires_at`, `created_at`, `revoked`. Many-to-one to `User`.
 - `password_reset_tokens` (`PasswordResetToken`): `id`, `user_id`, unique `token_hash`, `expires_at`, `used_at`, `created_at`. Many-to-one to `User`.
 - `email_verification_tokens` (`EmailVerificationToken`): same shape and relationship as password-reset tokens.

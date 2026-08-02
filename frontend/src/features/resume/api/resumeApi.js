@@ -20,6 +20,8 @@ export const listVersions = (id) => apiClient.get(`/api/v1/resumes/${id}/version
 export const getVersion = ({resumeId,versionId}) => apiClient.get(`/api/v1/resumes/${resumeId}/versions/${versionId}`).then(unwrap);
 export const rollbackVersion = ({resumeId,versionId}) => apiClient.post(`/api/v1/resumes/${resumeId}/versions/${versionId}/rollback`).then(unwrap);
 export const publishResume = (id) => apiClient.post(`/api/v1/resumes/${id}/publish`).then(unwrap);
+export const listPdfExports = (id, page = 0, size = 100) =>
+  apiClient.get(`/api/v1/pdf/resumes/${id}/history`, { params: { page, size } }).then(unwrap);
 
 export const downloadResumePdf = async (id, title = "resume") => {
   const response = await apiClient.get(`/api/v1/pdf/resumes/${id}`, { responseType: "blob" });

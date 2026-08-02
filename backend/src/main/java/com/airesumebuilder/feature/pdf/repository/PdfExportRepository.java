@@ -27,18 +27,27 @@ public class PdfExportRepository {
     }
 
     public void record(ResumeDocument resume, String name, long size, String hash) {
-        jdbc.update("INSERT INTO pdf_exports(user_id,resume_id,file_name,byte_size,content_sha256,created_at) VALUES (?,?,?,?,?,NOW(6))",
+        jdbc.update("INSERT INTO pdf_exports(user_id,resume_id,file_name,byte_size,content_sha256,created_at) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP)",
             resume.userId(), resume.id(), name, size, hash);
     }
 
-    public List<Export> history(String email, long resumeId) {
+    public List<Export> history(String email, long resumeId, int limit, int offset) {
         return jdbc.query(
             "SELECT p.id,p.resume_id,p.file_name,p.byte_size,p.content_sha256,p.created_at FROM pdf_exports p " +
-                "JOIN users u ON u.id=p.user_id WHERE u.email=? AND p.resume_id=? ORDER BY p.created_at DESC",
+                "JOIN users u ON u.id=p.user_id WHERE u.email=? AND p.resume_id=? ORDER BY p.created_at DESC,p.id DESC LIMIT ? OFFSET ?",
             this::export,
             email,
-            resumeId
+            resumeId,
+            limit,
+            offset
         );
+    }
+
+    public long historyCount(String email, long resumeId) {
+        Long count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM pdf_exports p JOIN users u ON u.id=p.user_id WHERE u.email=? AND p.resume_id=?",
+            Long.class, email, resumeId);
+        return count == null ? 0 : count;
     }
 
     private ResumeDocument document(ResultSet r, int row) throws SQLException {

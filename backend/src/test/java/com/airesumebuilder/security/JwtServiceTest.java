@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.airesumebuilder.common.exception.AuthenticationException;
 import com.airesumebuilder.feature.auth.entity.User;
 import java.time.Duration;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class JwtServiceTest {
@@ -44,6 +45,7 @@ class JwtServiceTest {
     private User user(long id, String role) {
         User user = mock(User.class);
         when(user.getId()).thenReturn(id);
+        when(user.getPublicId()).thenReturn(UUID.nameUUIDFromBytes(("test-user-" + id).getBytes()));
         when(user.getEmail()).thenReturn("person@example.com");
         when(user.getRole()).thenReturn(role);
         return user;

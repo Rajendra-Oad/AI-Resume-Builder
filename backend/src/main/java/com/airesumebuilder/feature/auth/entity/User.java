@@ -3,16 +3,21 @@ package com.airesumebuilder.feature.auth.entity;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+    @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
+    @UniqueConstraint(name = "uk_users_public_id", columnNames = "public_id")
 })
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_id", nullable = false, updatable = false)
+    private UUID publicId = UUID.randomUUID();
 
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
@@ -51,6 +56,9 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID();
+        }
         createdAt = Instant.now();
         updatedAt = Instant.now();
     }
@@ -62,6 +70,10 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public UUID getPublicId() {
+        return publicId;
     }
 
     public String getFirstName() {

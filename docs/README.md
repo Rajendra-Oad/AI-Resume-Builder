@@ -9,7 +9,7 @@ pages provide quick links for day-to-day development.
 For a beginner-friendly explanation of the implemented application, including
 the abstract, architecture, technology stack, folder connections, workflows,
 feature status, unused/optional parts, setup, security, and presentation notes,
-read [Complete Project Documentation](PROJECT_DOCUMENTATION.md).
+read the [Complete Learning Guide](../AI_RESUME_BUILDER_COMPLETE_LEARNING_GUIDE.md).
 
 ## Core Architecture Series
 
@@ -17,7 +17,7 @@ read [Complete Project Documentation](PROJECT_DOCUMENTATION.md).
 |---|---|---|
 | 01 | [Project Foundation Setup](01_Project_Foundation_Setup.md) | Project planning, repository structure, environments, branching, and governance. |
 | 02 | [Backend Architecture](02_Backend_Architecture.md) | Spring Boot module boundaries, layers, service patterns, events, and scaling strategy. |
-| 03 | [Database Architecture](03_Database_Architecture.md) | MySQL domain model, relationships, keys, constraints, indexing, and migration strategy. |
+| 03 | [Database Architecture](03_Database_Architecture.md) | PostgreSQL domain model, relationships, keys, constraints, indexing, and migration strategy. |
 | 04 | [Frontend Architecture](04_Frontend_Architecture.md) | React feature structure, routing, state, design system usage, performance, and accessibility. |
 | 05 | [REST API Architecture](05_REST_API_Architecture.md) | API resource model, response envelope, errors, pagination, auth, versioning, and documentation rules. |
 | 06 | [Authentication & Security](06_Authentication_Security.md) | Identity lifecycle, JWTs, refresh tokens, RBAC, rate limits, account recovery, and hardening. |
@@ -39,9 +39,9 @@ read [Complete Project Documentation](PROJECT_DOCUMENTATION.md).
 
 | Document | Use When |
 |---|---|
-| [Architecture](Architecture.md) | You need a short overview and links to the deeper architecture guides. |
+| [Architecture](../ARCHITECTURE.md) | You need a short overview and links to the deeper architecture guides. |
 | [API](API.md) | You need the current API conventions and the path to the full REST API guide. |
-| [Database](Database.md) | You need a compact database summary and the canonical schema guide. |
+| [Database Architecture](03_Database_Architecture.md) | You need a compact database summary and the canonical schema guide. |
 | [Development Guide](DevelopmentGuide.md) | You need local setup entry points and command references. |
 | [Coding Standards](CodingStandards.md) | You need day-to-day Java and React coding conventions. |
 | [Contributing](Contributing.md) | You need branch, PR, and commit rules for documentation or code changes. |

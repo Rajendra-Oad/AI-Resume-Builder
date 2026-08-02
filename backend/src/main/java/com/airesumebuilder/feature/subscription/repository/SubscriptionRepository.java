@@ -30,7 +30,7 @@ public class SubscriptionRepository {
     public Subscription createFree(String email) {
         int inserted = jdbc.update(
             "INSERT INTO subscriptions(user_id,plan,status,starts_at,is_current,created_at,updated_at) " +
-                "SELECT id,'FREE','ACTIVE',NOW(6),TRUE,NOW(6),NOW(6) FROM users " +
+                "SELECT id,'FREE','ACTIVE',CURRENT_TIMESTAMP,TRUE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP FROM users " +
                 "WHERE email=? AND deleted_at IS NULL " +
                 "AND NOT EXISTS (SELECT 1 FROM subscriptions s WHERE s.user_id=users.id AND s.is_current=TRUE)",
             email
@@ -88,9 +88,10 @@ public class SubscriptionRepository {
 
     public void cancelCurrent(String email) {
         int updated = jdbc.update(
-            "UPDATE subscriptions s JOIN users u ON u.id=s.user_id " +
-                "SET s.status='CANCELLED',s.is_current=FALSE,s.ends_at=NOW(6),s.updated_at=NOW(6) " +
-                "WHERE u.email=? AND u.deleted_at IS NULL AND s.is_current=TRUE AND s.plan<>'FREE'",
+            "UPDATE subscriptions s " +
+                "SET status='CANCELLED',is_current=FALSE,ends_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP " +
+                "FROM users u WHERE u.id=s.user_id AND u.email=? AND u.deleted_at IS NULL " +
+                "AND s.is_current=TRUE AND s.plan<>'FREE'",
             email
         );
         if (updated == 0) {

@@ -21,7 +21,7 @@ public class AtsRepository {
         List<AnalysisInput> rows = jdbc.query("""
             SELECT r.id resume_id, j.id job_id,
                    CONCAT_WS(' ', r.title, r.summary, r.target_job_title,
-                     GROUP_CONCAT(CONCAT_WS(' ', e.institution,e.degree,x.employer,x.role,p.name,p.description,s.name,s.proficiency_level,c.name,c.issued_by) SEPARATOR ' ')) resume_content,
+                     STRING_AGG(CONCAT_WS(' ', e.institution,e.degree,x.employer,x.role,p.name,p.description,s.name,s.proficiency_level,c.name,c.issued_by), ' ')) resume_content,
                    CONCAT_WS(' ', j.title,j.company_name,j.content,j.extracted_skills) job_content
             FROM resumes r JOIN users u ON u.id=r.user_id
             JOIN job_descriptions j ON j.id=? AND j.deleted_at IS NULL AND (j.user_id=u.id OR j.user_id IS NULL)
@@ -34,14 +34,15 @@ public class AtsRepository {
     }
 
     public long save(AnalysisInput input, BigDecimal score, List<KeywordResult> keywords) {
-        jdbc.update("INSERT INTO ats_reports(resume_id,job_description_id,overall_score,created_at) VALUES (?,?,?,NOW(6))",input.resumeId(),input.jobId(),score);
-        Long id=jdbc.queryForObject("SELECT LAST_INSERT_ID()",Long.class);
+        Long id=jdbc.queryForObject("INSERT INTO ats_reports(resume_id,job_description_id,overall_score,created_at) VALUES (?,?,?,CURRENT_TIMESTAMP) RETURNING id",Long.class,input.resumeId(),input.jobId(),score);
+        jdbc.update("INSERT INTO job_matches(resume_id,job_description_id,match_score,computed_at,expires_at) VALUES (?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP + INTERVAL '7 days') ON CONFLICT (resume_id,job_description_id) DO UPDATE SET match_score=EXCLUDED.match_score,computed_at=EXCLUDED.computed_at,expires_at=EXCLUDED.expires_at",input.resumeId(),input.jobId(),score);
         for(KeywordResult keyword:keywords){jdbc.update("INSERT INTO ats_keyword_matches(ats_report_id,keyword,found_in_resume,importance_weight) VALUES (?,?,?,1.000)",id,keyword.keyword(),keyword.found());if(!keyword.found())jdbc.update("INSERT INTO ats_missing_skills(ats_report_id,skill_name,suggested_action) VALUES (?,?,?)",id,keyword.keyword(),"Add this skill only when it accurately reflects your experience.");}
         if(score.compareTo(new BigDecimal("70"))<0)jdbc.update("INSERT INTO ats_recommendations(ats_report_id,category,recommendation_text) VALUES (?,'KEYWORDS','Tailor relevant skills and accomplishments to the job description without keyword stuffing.')",id);
         return id;
     }
 
-    public List<AtsService.ReportSummary> list(String email,long resumeId){return jdbc.query("SELECT a.id,a.resume_id,a.job_description_id,a.overall_score,a.created_at FROM ats_reports a JOIN resumes r ON r.id=a.resume_id JOIN users u ON u.id=r.user_id WHERE u.email=? AND r.id=? ORDER BY a.created_at DESC",this::summary,email,resumeId);}
+    public List<AtsService.ReportSummary> list(String email,long resumeId,int limit,int offset){return jdbc.query("SELECT a.id,a.resume_id,a.job_description_id,a.overall_score,a.created_at FROM ats_reports a JOIN resumes r ON r.id=a.resume_id JOIN users u ON u.id=r.user_id WHERE u.email=? AND r.id=? ORDER BY a.created_at DESC,a.id DESC LIMIT ? OFFSET ?",this::summary,email,resumeId,limit,offset);}
+    public long count(String email,long resumeId){Long count=jdbc.queryForObject("SELECT COUNT(*) FROM ats_reports a JOIN resumes r ON r.id=a.resume_id JOIN users u ON u.id=r.user_id WHERE u.email=? AND r.id=?",Long.class,email,resumeId);return count==null?0:count;}
     public AtsService.Report get(String email,long id){AtsService.ReportSummary base=jdbc.query("SELECT a.id,a.resume_id,a.job_description_id,a.overall_score,a.created_at FROM ats_reports a JOIN resumes r ON r.id=a.resume_id JOIN users u ON u.id=r.user_id WHERE u.email=? AND a.id=?",this::summary,email,id).stream().findFirst().orElseThrow(()->new ResourceNotFoundException("ATS report not found."));List<AtsService.Keyword>keys=jdbc.query("SELECT keyword,found_in_resume FROM ats_keyword_matches WHERE ats_report_id=? ORDER BY importance_weight DESC,keyword",(r,n)->new AtsService.Keyword(r.getString(1),r.getBoolean(2)),id);List<String>missing=jdbc.query("SELECT skill_name FROM ats_missing_skills WHERE ats_report_id=? ORDER BY skill_name",(r,n)->r.getString(1),id);List<AtsService.Recommendation>recommendations=jdbc.query("SELECT category,recommendation_text FROM ats_recommendations WHERE ats_report_id=? ORDER BY id",(r,n)->new AtsService.Recommendation(r.getString(1),r.getString(2)),id);return new AtsService.Report(base,keys,missing,recommendations);}
     private AtsService.ReportSummary summary(ResultSet r,int n)throws SQLException{Timestamp t=r.getTimestamp("created_at");return new AtsService.ReportSummary(r.getLong("id"),r.getLong("resume_id"),r.getLong("job_description_id"),r.getBigDecimal("overall_score"),t==null? Instant.EPOCH:t.toInstant());}
     public record AnalysisInput(long resumeId,long jobId,String resumeContent,String jobContent){}

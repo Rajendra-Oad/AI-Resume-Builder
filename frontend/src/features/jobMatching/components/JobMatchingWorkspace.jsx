@@ -17,7 +17,7 @@ export const JobMatchingWorkspace = () => {
   const [values, setValues] = useState(initialJob);
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
-  const jobs = useQuery({ queryKey: ["jobs"], queryFn: listJobs });
+  const jobs = useQuery({ queryKey: ["jobs"], queryFn: () => listJobs() });
   const createMutation = useMutation({
     mutationFn: createJob,
     onSuccess: () => {

@@ -1,0 +1,44 @@
+.admin-analytics { display: grid; gap: 1.25rem; }
+.admin-analytics > .section-header { align-items: flex-start; }
+.admin-analytics-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+.admin-analytics-filters .input { width: auto; min-width: 10.5rem; }
+.admin-analytics-range { color: var(--color-ink-subtle); font-size: 0.78rem; }
+
+.admin-analytics-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-analytics-kpi { display: grid; gap: 0.3rem; min-width: 0; }
+.admin-analytics-kpi__top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.8rem; }
+.admin-analytics-kpi__top > span {
+  display: grid;
+  place-items: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  color: var(--color-electric-blue);
+  background: var(--color-brand-soft);
+  border-radius: var(--radius-sm);
+}
+
+.admin-analytics-kpi__top small,
+.admin-analytics-kpi p,
+.admin-analytics-note { color: var(--color-ink-subtle); font-size: 0.75rem; }
+.admin-analytics-kpi > strong { font-size: 1.7rem; letter-spacing: -0.03em; }
+.admin-analytics-kpi h3,
+.admin-analytics-kpi p { margin: 0; }
+.admin-analytics-kpi h3 { font-size: 0.9rem; }
+.admin-analytics-activity .table-wrap { margin-inline: -0.5rem; }
+.admin-analytics-note { margin: 1rem 0 0; }
+
+@media (max-width: 1050px) {
+  .admin-analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 650px) {
+  .admin-analytics-kpis { grid-template-columns: 1fr; }
+  .admin-analytics-filters { align-items: stretch; flex-direction: column; }
+  .admin-analytics-filters .input,
+  .admin-analytics-filters .button { width: 100%; }
+}

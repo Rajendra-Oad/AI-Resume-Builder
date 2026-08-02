@@ -1,0 +1,75 @@
+name: Performance test
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: Approved non-production backend base URL
+        required: true
+        type: string
+      profile:
+        description: Load profile
+        required: true
+        default: smoke
+        type: choice
+        options:
+          - smoke
+          - normal
+      allow_writes:
+        description: Create and soft-delete synthetic data
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-${{ inputs.target_url }}
+  cancel-in-progress: false
+
+jobs:
+  k6:
+    name: Run approved k6 profile
+    runs-on: ubuntu-latest
+    environment: performance-test
+    timeout-minutes: 20
+    env:
+      BASE_URL: ${{ inputs.target_url }}
+      LOAD_PROFILE: ${{ inputs.profile }}
+      ALLOW_PRODUCTION: "true"
+      ALLOW_WRITES: ${{ inputs.allow_writes }}
+      ALLOW_AI: "false"
+      ALLOW_ATS: "false"
+      ALLOW_PDF: "false"
+      PERF_USERS_JSON: ${{ secrets.PERF_TEST_USERS_JSON }}
+      SUMMARY_JSON: performance/reports/summary.json
+      SUMMARY_HTML: performance/reports/summary.html
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject a production target
+        env:
+          PRODUCTION_BACKEND_URL: ${{ secrets.PRODUCTION_BACKEND_URL }}
+        run: |
+          test -n "$PRODUCTION_BACKEND_URL" || { echo "PRODUCTION_BACKEND_URL guard secret is required." >&2; exit 1; }
+          test "${BASE_URL%/}" != "${PRODUCTION_BACKEND_URL%/}" || { echo "Production load tests are prohibited in this workflow." >&2; exit 1; }
+      - name: Prepare report directory
+        run: mkdir -p performance/reports
+      - name: Run k6
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e BASE_URL -e LOAD_PROFILE -e ALLOW_PRODUCTION -e ALLOW_WRITES \
+            -e ALLOW_AI -e ALLOW_ATS -e ALLOW_PDF -e PERF_USERS_JSON \
+            -e SUMMARY_JSON -e SUMMARY_HTML \
+            -v "$PWD:/work" -w /work grafana/k6:2.0.0 run \
+            --out json=performance/reports/raw.json \
+            --out csv=performance/reports/metrics.csv \
+            performance/k6/main.js
+      - name: Upload performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-${{ inputs.profile }}-${{ github.run_id }}
+          path: performance/reports/
+          if-no-files-found: error
+          retention-days: 30

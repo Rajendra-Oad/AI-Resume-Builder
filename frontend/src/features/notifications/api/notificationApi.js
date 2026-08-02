@@ -1,8 +1,8 @@
 import apiClient from "../../../api/axiosInstance";
 
-export const listNotifications = (unreadOnly = false) =>
+export const listNotifications = (unreadOnly = false, page = 0, size = 20) =>
   apiClient
-    .get("/api/v1/notifications", { params: { unreadOnly } })
+    .get("/api/v1/notifications", { params: { unreadOnly, page, size } })
     .then((response) => response.data.data);
 
 export const markNotificationRead = (id) =>

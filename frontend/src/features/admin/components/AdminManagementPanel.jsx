@@ -14,6 +14,7 @@ import {
   listAuditEntries,
   listUsers,
 } from "../api/adminApi";
+import { AdminAnalyticsPanel } from "./AdminAnalyticsPanel";
 import { PromptAdminPanel } from "./PromptAdminPanel";
 
 const date = (value) =>
@@ -46,6 +47,7 @@ export const AdminManagementPanel = () => {
     onSuccess: () => client.invalidateQueries({ queryKey: ["admin-users"] }),
   });
   const isPrompts = tab === "prompts";
+  const isAnalytics = tab === "analytics";
   return (
     <ModulePage
       eyebrow="ADMINISTRATION"
@@ -65,6 +67,9 @@ export const AdminManagementPanel = () => {
         <Button variant={isPrompts ? "primary" : "ghost"} onClick={() => setTab("prompts")}>
           AI prompts
         </Button>
+        <Button variant={isAnalytics ? "primary" : "ghost"} onClick={() => setTab("analytics")}>
+          Analytics
+        </Button>
       </nav>
       {update.error && (
         <p className="form-error" role="alert">
@@ -73,6 +78,8 @@ export const AdminManagementPanel = () => {
       )}
       {isPrompts ? (
         <PromptAdminPanel />
+      ) : isAnalytics ? (
+        <AdminAnalyticsPanel />
       ) : tab === "users" ? (
         <AsyncState
           isLoading={users.isLoading}

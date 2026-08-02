@@ -22,7 +22,7 @@ public class ResumeVersionRepository {
         jdbc.queryForObject("SELECT id FROM resumes WHERE id=? FOR UPDATE", Long.class, resumeId);
         int inserted = jdbc.update(
             "INSERT INTO resume_versions(resume_id,template_id,version_number,source_type,label,created_at) " +
-                "SELECT r.id,r.template_id,COALESCE((SELECT MAX(v.version_number)+1 FROM resume_versions v WHERE v.resume_id=r.id),1),?,?,NOW(6) " +
+                "SELECT r.id,r.template_id,COALESCE((SELECT MAX(v.version_number)+1 FROM resume_versions v WHERE v.resume_id=r.id),1),?,?,CURRENT_TIMESTAMP " +
                 "FROM resumes r WHERE r.id=? AND r.deleted_at IS NULL",
             source,
             label,
@@ -35,7 +35,7 @@ public class ResumeVersionRepository {
             resumeId
         );
         jdbc.update(
-            "INSERT INTO resume_version_snapshots(resume_version_id,content,created_at) VALUES (?,CAST(? AS JSON),NOW(6))",
+            "INSERT INTO resume_version_snapshots(resume_version_id,content,created_at) VALUES (?,CAST(? AS JSONB),CURRENT_TIMESTAMP)",
             versionId,
             content
         );

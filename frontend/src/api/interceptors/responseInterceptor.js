@@ -1,10 +1,13 @@
 import { notify } from "../../components/NotificationProvider";
+import { captureApiFailure } from "../../observability";
 import { authSession } from "../../services/authSession";
 import { normalizeApiError } from "../errorHandler";
 import { expireSession, refreshAccessToken } from "../tokenRefresh";
 
 const isPublicAuthRequest = (url = "") =>
-  /\/auth\/(login|register|refresh|forgot-password|reset-password|verify-email|resend-verification)(?:[/?]|$)/.test(url);
+  /\/auth\/(login|register|refresh|forgot-password|reset-password|verify-email|resend-verification)(?:[/?]|$)/.test(
+    url,
+  );
 
 const shouldRefresh = (error) =>
   error.response?.status === 401 &&
@@ -16,6 +19,7 @@ export const installResponseInterceptor = (client) =>
   client.interceptors.response.use(
     (response) => response,
     async (error) => {
+      captureApiFailure(error);
       const request = error.config;
       if (shouldRefresh(error)) {
         request._retried = true;
@@ -37,7 +41,9 @@ export const installResponseInterceptor = (client) =>
         notify.error({
           title: "Service unavailable",
           message: normalized.message,
-          details: normalized.requestId ? `Request ID: ${normalized.requestId}` : normalized.message,
+          details: normalized.requestId
+            ? `Request ID: ${normalized.requestId}`
+            : normalized.message,
           copyError: true,
         });
       }

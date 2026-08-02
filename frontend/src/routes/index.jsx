@@ -7,7 +7,9 @@ import { RouteFocusManager } from "../components/RouteFocusManager";
 import { adminRoutes } from "../features/admin/routes";
 import { aiAssistantRoutes } from "../features/aiAssistant/routes";
 import { atsRoutes } from "../features/ats/routes";
+import { auditRoutes } from "../features/audit/routes";
 import { authRoutes } from "../features/auth/routes";
+import { billingRoutes } from "../features/billing/routes";
 import { coverLetterRoutes } from "../features/coverLetter/routes";
 import { dashboardRoutes } from "../features/dashboard/routes";
 import { jobMatchingRoutes } from "../features/jobMatching/routes";
@@ -60,6 +62,8 @@ const featureRoutes = [
   withFeatureBoundary("Profile", profileRoutes),
   withFeatureBoundary("Settings", settingsRoutes),
   withFeatureBoundary("AI assistant", aiAssistantRoutes),
+  withFeatureBoundary("Subscription and billing", billingRoutes),
+  withFeatureBoundary("Personal activity", auditRoutes),
 ];
 const router = createBrowserRouter([
   {

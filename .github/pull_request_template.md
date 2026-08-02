@@ -1,16 +1,19 @@
 ## Summary
 
-Describe the change and why it is needed.
+Describe the change and the user/operational outcome.
 
-## Verification
+## Validation
 
-- [ ] Relevant tests pass
-- [ ] Lint/format checks pass
-- [ ] Documentation is updated when applicable
-- [ ] Pull request title and commits follow Conventional Commits
-- [ ] The change is ready for review and is not self-approved
+- [ ] Backend tests pass, if applicable
+- [ ] Frontend lint/tests/build pass, if applicable
+- [ ] PostgreSQL migration integration passes, if applicable
+- [ ] Security and secret checks pass
+- [ ] Documentation and deployment impact reviewed
 
-## Security checklist
+## Risk and rollback
 
-- [ ] No secrets, tokens, or personal data were added
-- [ ] Authorization and validation were considered
+Describe compatibility risks, required environment changes, and the safe rollback or forward-fix path.
+
+## Release notes
+
+State the externally visible change, or write `None`.

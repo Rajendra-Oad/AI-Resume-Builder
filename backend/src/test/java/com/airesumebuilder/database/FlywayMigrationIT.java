@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class FlywayMigrationIT {
     @Test
-    void appliesAndValidatesEveryMigrationAgainstMySql() throws Exception {
+    void appliesAndValidatesEveryMigrationAgainstPostgreSql() throws Exception {
         String url = required("IT_DB_URL");
         String username = required("IT_DB_USERNAME");
         String password = required("IT_DB_PASSWORD");
@@ -34,20 +34,31 @@ class FlywayMigrationIT {
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
-            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=1"))
+            assertThat(count(statement, "SELECT COUNT(*) FROM flyway_schema_history WHERE success=TRUE"))
                 .isEqualTo(expectedMigrationCount);
             assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.tables "
-                + "WHERE table_schema=DATABASE() AND table_name IN "
+                + "WHERE table_schema=current_schema() AND table_name IN "
                 + "('users','resumes','ai_requests','ai_prompt_templates','ai_jobs','user_ai_provider_credentials')"))
                 .isEqualTo(6);
             assertThat(count(statement, "SELECT COUNT(*) FROM ai_providers WHERE provider_key IN ('gemini','openai')"))
                 .isEqualTo(2);
-            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() "
+            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=current_schema() "
                 + "AND table_name='resumes' AND column_name IN ('skills_content','font_family','page_margin')"))
                 .isEqualTo(3);
-            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() "
+            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=current_schema() "
                 + "AND table_name='users' AND column_name IN ('persona','career_goal','onboarding_completed')"))
                 .isEqualTo(3);
+            assertThat(count(statement, "SELECT COUNT(*) FROM pg_constraint "
+                + "WHERE conname='chk_users_status' "
+                + "AND pg_get_constraintdef(oid) LIKE '%PENDING_VERIFICATION%'"))
+                .isEqualTo(1);
+            assertThat(count(statement, "SELECT COUNT(*) FROM information_schema.columns "
+                + "WHERE table_schema=current_schema() AND table_name='users' "
+                + "AND column_name='public_id' AND data_type='uuid' AND is_nullable='NO'"))
+                .isEqualTo(1);
+            assertThat(count(statement, "SELECT COUNT(*) FROM pg_constraint "
+                + "WHERE conname='uk_users_public_id' AND contype='u'"))
+                .isEqualTo(1);
         }
     }
 

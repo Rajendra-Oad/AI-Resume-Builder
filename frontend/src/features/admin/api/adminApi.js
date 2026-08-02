@@ -5,3 +5,7 @@ export const changeUserRole = ({ id, value }) => apiClient.patch(`/api/v1/admin/
 export const changeUserStatus = ({ id, value }) => apiClient.patch(`/api/v1/admin/users/${id}/status`, { value }).then((r) => r.data.data);
 export const listAdminActions = () => apiClient.get("/api/v1/admin/actions", { params: { size: 20 } }).then(page);
 export const listAuditEntries = () => apiClient.get("/api/v1/admin/audit", { params: { size: 20 } }).then(page);
+export const getAdminAnalytics = ({ from, to }) =>
+  apiClient.get("/api/v1/admin/analytics/overview", { params: { from, to } }).then((r) => r.data.data);
+export const getAdminUsageMetrics = ({ from, to }) =>
+  apiClient.get("/api/v1/admin/analytics/usage-metrics", { params: { from, to } }).then((r) => r.data.data);

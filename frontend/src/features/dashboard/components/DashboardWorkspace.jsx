@@ -19,8 +19,11 @@ const StatCard = ({ icon, label, value, detail, tone = "" }) => (
 );
 
 export const DashboardWorkspace = () => {
-  const { name, resumes, recent, resumeCount } = useDashboardWorkspace();
+  const { name, resumes, recent, resumeCount, analytics } = useDashboardWorkspace();
   const profileProgress = resumeCount ? Math.min(92, 58 + resumeCount * 8) : 32;
+  const totals = analytics.data?.totals;
+  const metric = (value, suffix = "") =>
+    analytics.isLoading ? "…" : value == null ? "—" : `${value}${suffix}`;
 
   return (
     <main className="dashboard-page">
@@ -34,11 +37,12 @@ export const DashboardWorkspace = () => {
       </header>
 
       <section className="dashboard-metrics" aria-label="Workspace metrics">
-        <StatCard icon="document" label="Active resumes" value={resumeCount} detail={resumeCount ? "Ready to refine" : "Create your first draft"} />
-        <StatCard icon="ats" label="Average ATS score" value={resumeCount ? "82%" : "—"} detail={resumeCount ? "Strong foundation" : "Run your first analysis"} tone="metric-card--green" />
-        <StatCard icon="ai" label="AI credits" value="84" detail="16 used this cycle" tone="metric-card--violet" />
-        <StatCard icon="chart" label="Profile strength" value={`${profileProgress}%`} detail="Add recent experience" tone="metric-card--amber" />
+        <StatCard icon="document" label="Resumes created" value={metric(totals?.resumesCreated)} detail="During the last 30 days" />
+        <StatCard icon="ats" label="Average ATS score" value={metric(totals?.averageAtsScore == null ? null : Math.round(totals.averageAtsScore), "%")} detail={`${totals?.atsReports ?? 0} analyses in this period`} tone="metric-card--green" />
+        <StatCard icon="ai" label="AI requests" value={metric(totals?.aiRequests)} detail={`${totals?.aiTokens ?? 0} tokens processed`} tone="metric-card--violet" />
+        <StatCard icon="chart" label="PDF exports" value={metric(totals?.pdfExports)} detail="During the last 30 days" tone="metric-card--amber" />
       </section>
+      {analytics.isError && <p className="form-error" role="status">Live workspace metrics are temporarily unavailable.</p>}
 
       <section className="dashboard-feature-grid">
         <Card className="next-step-card" data-reveal>
