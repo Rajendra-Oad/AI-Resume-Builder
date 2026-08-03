@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import apiClient from "../../../api/axiosInstance";
-import { listPdfExports, downloadResumePdf } from "./resumeApi";
+import { downloadResumePdf,listPdfExports } from "./resumeApi";
 
 vi.mock("../../../api/axiosInstance", () => ({
   default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },

@@ -32,7 +32,7 @@ export default [
   {
     files: ["src/**/*.test.{js,jsx}"],
     languageOptions: {
-      globals: { describe: "readonly", expect: "readonly", it: "readonly" },
+      globals: { Blob: "readonly", describe: "readonly", expect: "readonly", it: "readonly" },
     },
   },
   {
