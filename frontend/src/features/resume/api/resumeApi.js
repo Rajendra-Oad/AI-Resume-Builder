@@ -24,7 +24,7 @@ export const listPdfExports = (id, page = 0, size = 100) =>
   apiClient.get(`/api/v1/pdf/resumes/${id}/history`, { params: { page, size } }).then(unwrap);
 
 export const downloadResumePdf = async (id, title = "resume") => {
-  const response = await apiClient.get(`/api/v1/pdf/resumes/${id}`, { responseType: "blob" });
+  const response = await apiClient.post(`/api/v1/pdf/resumes/${id}`, null, { responseType: "blob" });
   const url = window.URL.createObjectURL(response.data);
   const anchor = document.createElement("a");
   anchor.href = url;
