@@ -31,7 +31,7 @@ jobs:
             echo "Tag must use semantic versioning, for example v1.2.3 or v1.2.3-rc.1" >&2
             exit 1
           fi
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"

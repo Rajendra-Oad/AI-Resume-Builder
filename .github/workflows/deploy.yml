@@ -71,7 +71,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ needs.authorize.outputs.sha }}
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -123,7 +123,7 @@ jobs:
       - name: Reject high or critical frontend vulnerabilities
         working-directory: frontend
         run: npm audit --audit-level=high
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
