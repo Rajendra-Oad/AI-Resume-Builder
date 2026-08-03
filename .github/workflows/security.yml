@@ -87,7 +87,7 @@ jobs:
           key: dependency-check-${{ runner.os }}-12.2.2-${{ steps.dependency-check-cache-key.outputs.date }}
       - name: Upload Dependency-Check reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-dependency-check-reports
           path: |
