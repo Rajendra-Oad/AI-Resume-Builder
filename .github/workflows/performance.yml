@@ -46,7 +46,7 @@ jobs:
       SUMMARY_JSON: performance/reports/summary.json
       SUMMARY_HTML: performance/reports/summary.html
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Reject a production target
         env:
           PRODUCTION_BACKEND_URL: ${{ secrets.PRODUCTION_BACKEND_URL }}
