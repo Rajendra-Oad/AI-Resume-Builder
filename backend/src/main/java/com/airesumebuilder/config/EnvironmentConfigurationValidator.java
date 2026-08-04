@@ -22,7 +22,8 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         List<String> errors = validate(environment);
         if (!errors.isEmpty()) {
-            throw new IllegalStateException(format(errors));
+            boolean production = environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod"));
+            throw new IllegalStateException(format(errors, production));
         }
     }
 
@@ -217,13 +218,17 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         return value.toLowerCase().startsWith(PLACEHOLDER_PREFIX);
     }
 
-    private static String format(List<String> errors) {
+    private static String format(List<String> errors, boolean production) {
         StringBuilder message = new StringBuilder("\n\nEnvironment configuration validation failed with ")
             .append(errors.size()).append(" error(s):\n");
         for (int i = 0; i < errors.size(); i++) {
             message.append("  ").append(i + 1).append(") ").append(errors.get(i)).append('\n');
         }
-        return message.append("Update backend/.env or deployment environment variables, then restart. Secret values were not logged.").toString();
+        message.append("Update backend/.env or deployment environment variables, then restart. Secret values were not logged.");
+        if (production) {
+            message.append(" Production-only variables (see docs/Deployment.md) must be supplied in the deployment platform environment (e.g. Render service env vars).");
+        }
+        return message.toString();
     }
 
     @Override
