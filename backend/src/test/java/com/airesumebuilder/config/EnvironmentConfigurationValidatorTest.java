@@ -55,6 +55,35 @@ class EnvironmentConfigurationValidatorTest {
     }
 
     @Test
+    void rejectsIncompleteProductionConfiguration() {
+        MockEnvironment environment = validEnvironment()
+            .withProperty("DB_HOST", "internal-postgresql.render.internal")
+            .withProperty("DB_NAME", "ai_resume_builder")
+            .withProperty("DB_PORT", "5432");
+        environment.setActiveProfiles("prod");
+
+        assertThat(EnvironmentConfigurationValidator.validate(environment))
+            .contains(
+                "DB_USERNAME is required: least-privileged production PostgreSQL account.",
+                "APP_FRONTEND_URL is required: public HTTPS URL of the production frontend.",
+                "APP_CORS_ALLOWED_ORIGINS is required: comma-separated production frontend origins.",
+                "USER_API_KEY_ENCRYPTION_KEY is required: Base64-encoded 32-byte key for encrypted user provider credentials.",
+                "MANAGEMENT_METRICS_TOKEN is required: random token protecting the Prometheus metrics endpoint.",
+                "SPRING_MAIL_HOST is required: SMTP host required for account verification and recovery.",
+                "SPRING_MAIL_USERNAME is required: SMTP username required for account verification and recovery.",
+                "SPRING_MAIL_PASSWORD is required: SMTP password required for account verification and recovery."
+            );
+    }
+
+    @Test
+    void doesNotRequireProductionVariablesInDevelopment() {
+        MockEnvironment environment = validEnvironment();
+        environment.setActiveProfiles("dev");
+
+        assertThat(EnvironmentConfigurationValidator.validate(environment)).isEmpty();
+    }
+
+    @Test
     void rejectsMalformedOptionalUserApiKeyEncryptionKey() {
         MockEnvironment environment = validEnvironment()
             .withProperty("USER_API_KEY_ENCRYPTION_KEY", "not-valid-base64");

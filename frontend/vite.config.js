@@ -9,6 +9,12 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: "./src/test/setup.js",
+    // Force NODE_ENV=test. When the parent shell exports NODE_ENV=production
+    // (as CI or some dev shells do), the CJS builds of react/react-dom load in
+    // production mode, where `React.act` does not exist — @testing-library/react
+    // then falls back to the deprecated react-dom/test-utils shim that calls
+    // `React.act(...)`, crashing every test with "React.act is not a function".
+    env: { NODE_ENV: "test" },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov", "json-summary"],
