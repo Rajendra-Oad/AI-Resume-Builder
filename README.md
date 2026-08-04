@@ -25,6 +25,32 @@ npm test
 npm run build
 ```
 
+### Backend environment variables
+
+Copy `backend/.env.example` to `backend/.env` (the backend loads it automatically on startup) and fill in the values below. The backend refuses to start while a required variable is missing or still contains a placeholder. Variable names are identical across local development, Docker, CI, and the Render deployment; only the database location differs (see below).
+
+Required in every environment (development, tests, and production):
+
+| Variable | Purpose |
+| --- | --- |
+| `DB_URL` (or `DB_HOST` + `DB_NAME` + `DB_USERNAME`) | PostgreSQL location. Local development and Docker use the single `DB_URL`; Render injects the decomposed host/port/name form and the production profile builds the URL from it. |
+| `DB_PASSWORD` | PostgreSQL password |
+| `JWT_SECRET` | Random HMAC secret of at least 32 characters |
+
+Required only in production (`SPRING_PROFILES_ACTIVE=prod`, e.g. Render):
+
+| Variable | Purpose |
+| --- | --- |
+| `APP_FRONTEND_URL` | Public HTTPS frontend URL |
+| `APP_CORS_ALLOWED_ORIGINS` | Comma-separated HTTPS frontend origins |
+| `USER_API_KEY_ENCRYPTION_KEY` | Base64 encoding of exactly 32 random bytes (BYOK credential encryption) |
+| `MANAGEMENT_METRICS_TOKEN` | Random token protecting the Prometheus metrics endpoint |
+| `SPRING_MAIL_HOST` / `SPRING_MAIL_USERNAME` / `SPRING_MAIL_PASSWORD` | SMTP for verification and recovery email (all-or-nothing) |
+| `GEMINI_API_KEY` or `OPENAI_API_KEY` | Credential for the configured `AI_PROVIDER` |
+| `APP_SECURE_COOKIES=true` | Requires HTTPS cookies |
+
+Optional variables validated only when set include `AI_PROVIDER`, `AI_RATE_LIMIT_PER_USER_PER_HOUR`, `AI_BUDGET_PER_USER_MONTHLY_USD`, `AI_CACHE_TTL_SECONDS`, `JWT_ACCESS_TOKEN_TTL`, `REFRESH_TOKEN_TTL`, `REDIS_HOST`/`REDIS_PORT` (when `AI_REDIS_ENABLED=true`), and `DEV_SEED_PASSWORD` (when `DEV_SEED_ENABLED=true`). The full annotated list lives in `backend/.env.example`; the production runbook is `docs/Deployment.md`. The frontend needs only `VITE_DEV_PROXY_TARGET` locally and should leave `VITE_API_BASE_URL` unset (see `frontend/.env.example`).
+
 ## Production deployment
 
 The supported production target is:
