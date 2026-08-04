@@ -29,7 +29,7 @@ public class AiUserSettingsService {
     public AiUserSettingsService(
             AiUserSettingsRepository settingsRepository,
             UserAccountQueryService userAccounts,
-            @Value("${app.ai.user-key-encryption-key:}") String encodedKey) {
+            @Value("${USER_API_KEY_ENCRYPTION_KEY:}") String encodedKey) {
         this.settingsRepository = settingsRepository;
         this.userAccounts = userAccounts;
         this.encryptionKey = decodeKey(encodedKey);
