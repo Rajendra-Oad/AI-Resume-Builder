@@ -1,0 +1,23 @@
+name: Question
+description: Ask a question about setup, usage, or architecture
+title: "question: "
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you need help with?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What have you already tried? Any relevant logs or screenshots?
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, Java version, browser, etc.
+      placeholder: "e.g., Windows 11, Node 22, Chrome 120"
