@@ -111,6 +111,7 @@ public final class EnvironmentConfigurationValidator implements EnvironmentPostP
         require(environment, errors, "SPRING_MAIL_HOST", "SMTP host required for account verification and recovery");
         require(environment, errors, "SPRING_MAIL_USERNAME", "SMTP username required for account verification and recovery");
         require(environment, errors, "SPRING_MAIL_PASSWORD", "SMTP password required for account verification and recovery");
+        require(environment, errors, "MAIL_FROM", "sender email address required for account verification and recovery");
         String provider = environment.getProperty("AI_PROVIDER", "gemini").trim().toLowerCase();
         if ("gemini".equals(provider)) require(environment, errors, "GEMINI_API_KEY", "platform Gemini provider credential");
         if ("openai".equals(provider)) require(environment, errors, "OPENAI_API_KEY", "platform OpenAI provider credential");

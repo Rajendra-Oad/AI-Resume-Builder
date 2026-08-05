@@ -48,7 +48,8 @@ class EnvironmentConfigurationValidatorTest {
             .withProperty("GEMINI_API_KEY", "gemini-test-key")
             .withProperty("SPRING_MAIL_HOST", "smtp.example.com")
             .withProperty("SPRING_MAIL_USERNAME", "mailer")
-            .withProperty("SPRING_MAIL_PASSWORD", "mail-password");
+            .withProperty("SPRING_MAIL_PASSWORD", "mail-password")
+            .withProperty("MAIL_FROM", "no-reply@example.com");
         environment.setActiveProfiles("prod");
 
         assertThat(EnvironmentConfigurationValidator.validate(environment)).isEmpty();
@@ -71,7 +72,8 @@ class EnvironmentConfigurationValidatorTest {
                 "MANAGEMENT_METRICS_TOKEN is required: random token protecting the Prometheus metrics endpoint.",
                 "SPRING_MAIL_HOST is required: SMTP host required for account verification and recovery.",
                 "SPRING_MAIL_USERNAME is required: SMTP username required for account verification and recovery.",
-                "SPRING_MAIL_PASSWORD is required: SMTP password required for account verification and recovery."
+                "SPRING_MAIL_PASSWORD is required: SMTP password required for account verification and recovery.",
+                "MAIL_FROM is required: sender email address required for account verification and recovery."
             );
     }
 
