@@ -1,3 +1,16 @@
+/**
+ * Returns a cryptographically secure random integer in [0, max) without modulo bias.
+ * Uses rejection sampling: discards values that would introduce uneven distribution.
+ */
+function unbiasedRandom(max) {
+  const limit = Math.floor(0xFFFFFFFF / max) * max;
+  let r;
+  do {
+    r = globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
+  } while (r >= limit);
+  return r % max;
+}
+
 const COMMON_PASSWORDS = new Set([
   "12345678", "123456789", "password", "password1", "qwerty123",
   "letmein", "welcome", "admin123", "iloveyou", "monkey123",
@@ -65,13 +78,13 @@ export const generateStrongPassword = (length = 20) => {
     "23456789",
     "!@#$%^&*()-_=+[]{};:,.?",
   ];
-  const output = groups.map((group) => group[globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % group.length]);
+  const output = groups.map((group) => group[unbiasedRandom(group.length)]);
   const all = groups.join("");
   while (output.length < Math.max(16, Math.min(24, length))) {
-    output.push(all[globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % all.length]);
+    output.push(all[unbiasedRandom(all.length)]);
   }
   for (let index = output.length - 1; index > 0; index -= 1) {
-    const swap = globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % (index + 1);
+    const swap = unbiasedRandom(index + 1);
     [output[index], output[swap]] = [output[swap], output[index]];
   }
   return output.join("");
