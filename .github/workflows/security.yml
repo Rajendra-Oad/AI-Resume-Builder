@@ -63,7 +63,7 @@ jobs:
         run: echo "date=$(date -u +'%Y%m%d')" >> "$GITHUB_OUTPUT"
       - name: Restore Dependency-Check vulnerability data
         id: dependency-check-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: backend/.dependency-check-data
           key: dependency-check-${{ runner.os }}-12.2.2-${{ steps.dependency-check-cache-key.outputs.date }}
@@ -81,7 +81,7 @@ jobs:
           -DnvdApiKeyEnvironmentVariable=NVD_API_KEY
       - name: Save Dependency-Check vulnerability data
         if: always() && steps.dependency-check-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: backend/.dependency-check-data
           key: dependency-check-${{ runner.os }}-12.2.2-${{ steps.dependency-check-cache-key.outputs.date }}
