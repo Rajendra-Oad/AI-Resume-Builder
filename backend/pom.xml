@@ -27,7 +27,7 @@
     <postgresql.version>42.7.13</postgresql.version>
     <spring-framework.version>6.2.19</spring-framework.version>
     <spring-security.version>6.5.11</spring-security.version>
-    <swagger-ui.version>5.32.11</swagger-ui.version>
+    <swagger-ui.version>5.32.13</swagger-ui.version>
     <tomcat.version>10.1.57</tomcat.version>
     <backend.coverage.minimum>0.24</backend.coverage.minimum>
   </properties>
